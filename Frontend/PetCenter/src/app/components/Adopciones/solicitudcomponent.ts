@@ -1,80 +1,90 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { PetcenterService } from '../../../core/services/petcenter.service';
-import { Mascota } from '../../../models/mascota.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { PetcenterService } from '../../services/petcenter.service';
+import { Solicitud, CrearSolicitud } from '../../models/solicitudmodel';
+import { Mascota } from '../../models/mascotamodel';
 
 @Component({
-  selector: 'app-formulario-solicitud',
-  templateUrl: './formulario-solicitud.component.html',
-  styleUrl: './formulario-solicitud.component.css'
+  selector: 'app-solicitud',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './solicitudcomponent.html',
+  styleUrls: ['./solicitudcomponent.css']
 })
-export class FormularioSolicitudComponent implements OnInit {
-
-  // ── Estado ──────────────────────────────────
-  mascota: Mascota | null = null;
+export class SolicitudComponent implements OnInit {
+  solicitudes: Solicitud[] = [];
+  mascotasDisponibles: Mascota[] = [];
   cargando = true;
   enviando = false;
-  enviado = false;
   error = '';
+  exito = '';
 
-  // ── Datos del formulario ─────────────────────
-  comentarios = '';
+  // ID de usuario hardcodeado por ahora (luego vendrá del login)
+  usuarioId = '1';
 
-  // ── IDs necesarios ───────────────────────────
-  mascotaId = '';
-  usuarioId = '';            // vendrá del servicio de auth cuando lo implementen
+  nuevaSolicitud: CrearSolicitud = {
+    usuario_id: this.usuarioId,
+    mascota_id: '',
+    comentarios_admin: ''
+  };
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private petService: PetcenterService
-  ) { }
+  constructor(private petcenterService: PetcenterService) { }
 
-  // ── Ciclo de vida ────────────────────────────
   ngOnInit(): void {
-    this.mascotaId = this.route.snapshot.paramMap.get('id') || '';
-    this.usuarioId = 'uuid-del-usuario-logueado'; // reemplazar con auth
-    this.cargarMascota();
+    this.cargarDatos();
   }
 
-  // ── Métodos ──────────────────────────────────
-  cargarMascota(): void {
-    this.petService.getMascotaPorId(this.mascotaId).subscribe({
-      next: (data) => {
-        this.mascota = data[0];
+  cargarDatos(): void {
+    this.petcenterService.getMascotasDisponibles().subscribe({
+      next: (mascotas) => {
+        this.mascotasDisponibles = mascotas;
         this.cargando = false;
       },
       error: () => {
-        this.error = 'No se pudo cargar la mascota';
+        this.error = 'Error al cargar mascotas disponibles.';
         this.cargando = false;
+      }
+    });
+
+    this.petcenterService.getSolicitudesPorUsuario(this.usuarioId).subscribe({
+      next: (solicitudes) => {
+        this.solicitudes = solicitudes;
       }
     });
   }
 
   enviarSolicitud(): void {
-    if (!this.mascotaId || !this.usuarioId) return;
+    if (!this.nuevaSolicitud.mascota_id) {
+      this.error = 'Selecciona una mascota para continuar.';
+      return;
+    }
 
     this.enviando = true;
+    this.error = '';
+    this.exito = '';
 
-    const solicitud = {
-      usuario_id: this.usuarioId,
-      mascota_id: this.mascotaId,
-      comentarios_admin: this.comentarios || null
-    };
-
-    this.petService.crearSolicitud(solicitud).subscribe({
+    this.petcenterService.crearSolicitud(this.nuevaSolicitud).subscribe({
       next: () => {
-        this.enviado = true;
+        this.exito = '¡Solicitud enviada correctamente! Te contactaremos pronto.';
         this.enviando = false;
+        this.nuevaSolicitud.mascota_id = '';
+        this.nuevaSolicitud.comentarios_admin = '';
+        this.cargarDatos();
       },
       error: () => {
-        this.error = 'Error al enviar la solicitud, intenta de nuevo';
+        this.error = 'Error al enviar la solicitud. Intenta de nuevo.';
         this.enviando = false;
       }
     });
   }
 
-  cancelar(): void {
-    this.router.navigate(['/mascotas']);
+  getEstadoBadge(estado: string): string {
+    const clases: Record<string, string> = {
+      pendiente: 'badge-pendiente',
+      aprobada: 'badge-aprobada',
+      rechazada: 'badge-rechazada'
+    };
+    return clases[estado] ?? '';
   }
 }

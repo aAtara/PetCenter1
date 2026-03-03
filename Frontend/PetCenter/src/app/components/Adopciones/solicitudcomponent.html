@@ -1,0 +1,49 @@
+<section class="adopciones-container">
+  <h2 class="titulo">🏡 Solicitar Adopción</h2>
+
+  <!-- Formulario -->
+  <div class="formulario-card">
+    <h3>Nueva Solicitud</h3>
+
+    <div *ngIf="error" class="alerta error">{{ error }}</div>
+    <div *ngIf="exito" class="alerta exito">{{ exito }}</div>
+
+    <div *ngIf="cargando" class="estado-mensaje">Cargando mascotas disponibles...</div>
+
+    <div *ngIf="!cargando" class="form-group">
+      <label for="mascota">Selecciona la mascota</label>
+      <select id="mascota" [(ngModel)]="nuevaSolicitud.mascota_id" class="input-campo">
+        <option value="" disabled>-- Elige una mascota --</option>
+        <option *ngFor="let m of mascotasDisponibles" [value]="m.id">
+          {{ m.nombre }} ({{ m.genero }})
+        </option>
+      </select>
+
+      <label for="comentarios">Cuéntanos sobre ti (opcional)</label>
+      <textarea id="comentarios"
+                [(ngModel)]="nuevaSolicitud.comentarios_admin"
+                class="input-campo"
+                rows="4"
+                placeholder="¿Por qué quieres adoptar esta mascota? ¿Tienes experiencia con animales?">
+      </textarea>
+
+      <button class="btn-enviar"
+              (click)="enviarSolicitud()"
+              [disabled]="enviando">
+        {{ enviando ? 'Enviando...' : 'Enviar Solicitud' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Historial de solicitudes -->
+  <div class="historial" *ngIf="solicitudes.length > 0">
+    <h3>Mis Solicitudes</h3>
+    <div class="solicitud-item" *ngFor="let s of solicitudes">
+      <div class="solicitud-info">
+        <span class="campo">Mascota ID: {{ s.mascota_id }}</span>
+        <span class="campo">Fecha: {{ s.fecha_solicitud | date:'dd/MM/yyyy' }}</span>
+      </div>
+      <span [class]="'badge ' + getEstadoBadge(s.estado)">{{ s.estado }}</span>
+    </div>
+  </div>
+</section>
