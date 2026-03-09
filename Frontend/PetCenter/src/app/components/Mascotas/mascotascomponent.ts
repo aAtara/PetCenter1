@@ -1,68 +1,46 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { PetcenterService } from '../../../core/services/petcenter.service';
-import { Mascota } from '../../../models/mascotamodel';
+import { CommonModule } from '@angular/common';
+import { PetcenterService } from '../../services/petcenter.service';
 
 @Component({
-  selector: 'app-lista-mascotas',
-  templateUrl: './lista-mascotas.component.html',
-  styleUrl: './lista-mascotas.component.css'
+  selector: 'app-mascotas',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './mascotascomponent.html',
+  styleUrls: ['./mascotascomponent.css']
 })
-export class ListaMascotasComponent implements OnInit {
-
-  // ── Estado ──────────────────────────────────
-  mascotas: Mascota[] = [];
-  mascotasFiltradas: Mascota[] = [];
+export class MascotasComponent implements OnInit {
+  mascotas: any[] = [];
   cargando = true;
   error = '';
 
-  // ── Filtros ──────────────────────────────────
-  filtroEspecie = '';
-  filtroGenero = '';
-  filtroNombre = '';
+  constructor(private petcenterService: PetcenterService) { }
 
-  constructor(
-    private petService: PetcenterService,
-    private router: Router
-  ) { }
-
-  // ── Ciclo de vida ────────────────────────────
   ngOnInit(): void {
     this.cargarMascotas();
   }
 
-  // ── Métodos ──────────────────────────────────
   cargarMascotas(): void {
     this.cargando = true;
-    this.petService.getMascotas().subscribe({
+    this.petcenterService.getMascotasDetalle().subscribe({
       next: (data) => {
         this.mascotas = data;
-        this.mascotasFiltradas = data;
         this.cargando = false;
       },
-      error: () => {
-        this.error = 'Error al cargar las mascotas';
+      error: (err) => {
+        this.error = 'Error al cargar las mascotas. Verifica que el servidor esté corriendo.';
         this.cargando = false;
+        console.error(err);
       }
     });
   }
 
-  filtrar(): void {
-    this.mascotasFiltradas = this.mascotas.filter(m => {
-      const coincideNombre = m.nombre.toLowerCase()
-        .includes(this.filtroNombre.toLowerCase());
-      const coincideGenero = this.filtroGenero ? m.genero === this.filtroGenero : true;
-      return coincideNombre && coincideGenero;
-    });
-  }
-
-  verDetalle(id: string): void {
-    this.router.navigate(['/mascotas', id]);
-  }
-
-  limpiarFiltros(): void {
-    this.filtroNombre = '';
-    this.filtroGenero = '';
-    this.mascotasFiltradas = this.mascotas;
+  getEstadoClase(estado: string): string {
+    const clases: Record<string, string> = {
+      disponible: 'estado-disponible',
+      en_proceso: 'estado-proceso',
+      adoptado: 'estado-adoptado'
+    };
+    return clases[estado] ?? '';
   }
 }

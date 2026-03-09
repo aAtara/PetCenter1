@@ -1,0 +1,137 @@
+.mascotas-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.titulo {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 1.5rem;
+}
+
+/* Grid */
+.mascotas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card */
+.mascota-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+  .mascota-card:hover {
+    transform: translateY(-4px);
+  }
+
+.mascota-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.icono-especie {
+  font-size: 2rem;
+}
+
+/* Badges de estado */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.estado-disponible {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.estado-proceso {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.estado-adoptado {
+  background: #e5e7eb;
+  color: #6b7280;
+}
+
+/* Info */
+.mascota-info {
+  padding: 0.75rem 1rem;
+  flex: 1;
+}
+
+  .mascota-info h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
+    color: #1e293b;
+  }
+
+  .mascota-info p {
+    font-size: 0.9rem;
+    color: #475569;
+    margin: 0.2rem 0;
+  }
+
+.descripcion {
+  margin-top: 0.5rem !important;
+  font-style: italic;
+  color: #64748b !important;
+}
+
+/* Footer */
+.mascota-footer {
+  padding: 1rem;
+}
+
+.btn-adoptar {
+  width: 100%;
+  padding: 0.65rem;
+  border: none;
+  border-radius: 8px;
+  background: #f97316;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+  .btn-adoptar:hover:not(:disabled) {
+    background: #ea580c;
+  }
+
+  .btn-adoptar:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    color: #9ca3af;
+  }
+
+/* Mensajes de estado */
+.estado-mensaje {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.alerta-error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #991b1b;
+  margin-bottom: 1rem;
+}

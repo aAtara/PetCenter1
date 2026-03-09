@@ -1,0 +1,44 @@
+<section class="mascotas-container">
+  <h2 class="titulo">🐾 Mascotas en Adopción</h2>
+
+  <!-- Cargando -->
+  <div *ngIf="cargando" class="estado-mensaje">
+    <p>Cargando mascotas...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alerta-error">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Sin mascotas -->
+  <div *ngIf="!cargando && !error && mascotas.length === 0" class="estado-mensaje">
+    <p>No hay mascotas disponibles por el momento.</p>
+  </div>
+
+  <!-- Grid de mascotas -->
+  <div *ngIf="!cargando && !error && mascotas.length > 0" class="mascotas-grid">
+    <div class="mascota-card" *ngFor="let mascota of mascotas">
+      <div class="mascota-header">
+        <span class="icono-especie">{{ mascota.raza_especie === 'gato' ? '🐱' : '🐶' }}</span>
+        <span [class]="'badge ' + getEstadoClase(mascota.estado)">{{ mascota.estado }}</span>
+      </div>
+
+      <div class="mascota-info">
+        <h3>{{ mascota.nombre }}</h3>
+        <p><strong>Raza:</strong> {{ mascota.raza_nombre }}</p>
+        <p><strong>Edad:</strong> {{ mascota.edad_meses }} meses</p>
+        <p><strong>Género:</strong> {{ mascota.genero }}</p>
+        <p class="descripcion">{{ mascota.descripcion }}</p>
+      </div>
+
+      <div class="mascota-footer">
+        <button class="btn-adoptar"
+                [disabled]="mascota.estado !== 'disponible'"
+                routerLink="/adopciones">
+          {{ mascota.estado === 'disponible' ? 'Quiero adoptarlo' : 'No disponible' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
