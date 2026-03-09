@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Frontend",
+    "\\Frontend\\PetCenter",
+    "\\Frontend\\PetCenter\\src",
+    "\\Frontend\\PetCenter\\src\\app",
+    "\\Frontend\\PetCenter\\src\\app\\components",
+    "\\Frontend\\PetCenter\\src\\app\\components\\Mascotas",
+    "\\Frontend\\PetCenter\\src\\app\\models",
+    "\\Frontend\\PetCenter\\src\\app\\services"
+  ],
+  "SelectedNode": "\\Frontend\\PetCenter\\src\\app\\components\\login\\login.css",
+  "PreviewInSolutionExplorer": false
+}

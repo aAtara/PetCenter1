@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+
+  db:
+    image: postgres:15
+    container_name: petcenter_db
+    restart: always
+    environment:
+      POSTGRES_DB: petcenter
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  postgrest:
+    image: postgrest/postgrest:v12.0.2
+    container_name: petcenter_api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      PGRST_DB_URI: postgres://admin:secret@db:5432/petcenter
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: admin
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3000
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:

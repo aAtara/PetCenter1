@@ -1,0 +1,77 @@
+# PetCenter 🐾
+
+Aplicación fullstack de adopción de mascotas.
+
+**Stack:** Angular + PostgREST + PostgreSQL + Docker
+
+---
+
+## Estructura del proyecto
+
+```
+PetCenter1/
+├── docker-compose.yml      ← levanta DB + API
+├── init.sql                ← crea las tablas
+├── .gitignore
+└── Frontend/
+    └── PetCenter/          ← proyecto Angular
+        ├── src/app/
+        │   ├── components/
+        │   │   ├── Mascotas/
+        │   │   ├── Adopciones/
+        │   │   └── login/
+        │   ├── models/
+        │   └── services/
+        └── proxy.conf.json
+```
+
+---
+
+## Cómo correr el proyecto
+
+### 1. Levantar Docker (backend + base de datos)
+
+Desde la raíz del proyecto (donde está `docker-compose.yml`):
+
+```bash
+docker compose up
+```
+
+Esto levanta:
+- PostgreSQL en `localhost:5432`
+- PostgREST (API) en `localhost:3000`
+
+Verifica que funciona: http://localhost:3000/mascotas
+
+### 2. Correr Angular (frontend)
+
+```bash
+cd Frontend/PetCenter
+npm install
+ng serve
+```
+
+Angular corre en http://localhost:4200
+
+El `proxy.conf.json` ya está configurado para redirigir `/api/*` → `localhost:3000/*` automáticamente.
+
+---
+
+## Endpoints disponibles (PostgREST)
+
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| GET | `/api/mascotas` | Todas las mascotas |
+| GET | `/api/mascotas?estado=eq.disponible` | Solo disponibles |
+| GET | `/api/mascotas_detalle` | Mascotas con nombre de raza |
+| GET | `/api/solicitudes` | Todas las solicitudes |
+| POST | `/api/solicitudes` | Crear solicitud |
+| PATCH | `/api/solicitudes?id=eq.1` | Actualizar solicitud |
+
+---
+
+## Notas importantes
+
+- La carpeta `.angular/` **NO** debe subirse a git (ya está en `.gitignore`)
+- El `proxy.conf.json` evita problemas de CORS en desarrollo
+- Para producción se necesita configurar CORS en PostgREST
