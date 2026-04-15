@@ -1,0 +1,325 @@
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">🐾</div>
+      <div class="brand-text">
+        <h2>PetCenter</h2>
+        <span>Panel de control</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item" [class.active]="seccionActiva === 'inicio'" (click)="irA('inicio')">
+        <span class="icon">🏠</span> Inicio
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'mascotas'" (click)="irA('mascotas')">
+        <span class="icon">🐶</span> Mascotas
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'solicitudes'" (click)="irA('solicitudes')">
+        <span class="icon">📋</span> Solicitudes
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'veterinario'" (click)="irA('veterinario')">
+        <span class="icon">🩺</span> Veterinario
+      </button>
+    </nav>
+
+    <button class="logout" (click)="cerrarSesion()">
+      <span class="icon">🚪</span> Cerrar sesión
+    </button>
+  </aside>
+
+  <!-- Contenido principal -->
+  <main class="main">
+    <header class="top-bar">
+      <div>
+        <h1>Hola, {{ usuario?.nombre }} 👋</h1>
+        <p class="subtitle">
+          Bienvenido al panel
+          <span class="rol-badge" [class.admin]="esAdmin">{{ usuario?.rol }}</span>
+        </p>
+      </div>
+      <div class="user-chip">
+        <div class="avatar">{{ iniciales }}</div>
+        <div class="user-info">
+          <strong>{{ usuario?.nombre }}</strong>
+          <small>{{ usuario?.email }}</small>
+        </div>
+      </div>
+    </header>
+
+    <!-- Sección Inicio -->
+    <section *ngIf="seccionActiva === 'inicio'" class="content">
+      <div *ngIf="cargando" class="loading">Cargando datos...</div>
+
+      <div *ngIf="!cargando">
+        <!-- Tarjetas de estadísticas -->
+        <div class="stats-grid">
+          <div class="stat-card total">
+            <div class="stat-icon">🐾</div>
+            <div class="stat-info">
+              <span class="stat-label">Total mascotas</span>
+              <span class="stat-value">{{ stats.total }}</span>
+            </div>
+          </div>
+          <div class="stat-card disponible">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <span class="stat-label">Disponibles</span>
+              <span class="stat-value">{{ stats.disponibles }}</span>
+            </div>
+          </div>
+          <div class="stat-card proceso">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <span class="stat-label">En proceso</span>
+              <span class="stat-value">{{ stats.enProceso }}</span>
+            </div>
+          </div>
+          <div class="stat-card adoptado">
+            <div class="stat-icon">❤️</div>
+            <div class="stat-info">
+              <span class="stat-label">Adoptados</span>
+              <span class="stat-value">{{ stats.adoptados }}</span>
+            </div>
+          </div>
+          <div class="stat-card solicitudes">
+            <div class="stat-icon">📨</div>
+            <div class="stat-info">
+              <span class="stat-label">Solicitudes pendientes</span>
+              <span class="stat-value">{{ stats.solicitudesPendientes }}</span>
+            </div>
+          </div>
+          <div class="stat-card consultas">
+            <div class="stat-icon">🩺</div>
+            <div class="stat-info">
+              <span class="stat-label">Consultas veterinarias</span>
+              <span class="stat-value">{{ stats.consultas }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimas mascotas -->
+        <div class="panel">
+          <div class="panel-header">
+            <h2>Últimas mascotas ingresadas</h2>
+            <button class="link-btn" (click)="irA('mascotas')">Ver todas →</button>
+          </div>
+
+          <div *ngIf="ultimasMascotas.length === 0" class="empty">No hay mascotas registradas.</div>
+
+          <table *ngIf="ultimasMascotas.length > 0" class="table">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Raza</th>
+                <th>Edad</th>
+                <th>Género</th>
+                <th>Estado</th>
+                <th>Fecha ingreso</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let m of ultimasMascotas">
+                <td><strong>{{ m.nombre }}</strong></td>
+                <td>{{ m.raza_nombre }} <small>({{ m.raza_especie }})</small></td>
+                <td>{{ m.edad_meses }} meses</td>
+                <td>{{ m.genero }}</td>
+                <td>
+                  <span class="estado" [ngClass]="'estado-' + m.estado">
+                    {{ m.estado.replace('_', ' ') }}
+                  </span>
+                </td>
+                <td>{{ m.fecha_ingreso }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Placeholder de secciones que ya se conectarán a tus componentes existentes -->
+    <section *ngIf="seccionActiva === 'mascotas'" class="content">
+      <div class="panel">
+        <h2>Gestión de mascotas</h2>
+        <p class="hint">Aquí se integrará el componente <code>MascotasComponent</code>.</p>
+      </div>
+    </section>
+
+    <section *ngIf="seccionActiva === 'solicitudes'" class="content">
+      <div class="panel">
+        <h2>Solicitudes de adopción</h2>
+        <p class="hint">Aquí se integrará el componente <code>SolicitudComponent</code>.</p>
+      </div>
+    </section>
+
+    <!-- ═════════════ Sección Veterinario ═════════════ -->
+    <section *ngIf="seccionActiva === 'veterinario'" class="content">
+      <div *ngIf="mensaje" class="toast">{{ mensaje }}</div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab" [class.active]="tabVet === 'consultas'" (click)="tabVet = 'consultas'">
+          🩺 Historial de consultas
+        </button>
+        <button class="tab" [class.active]="tabVet === 'veterinarios'" (click)="tabVet = 'veterinarios'">
+          👨‍⚕️ Veterinarios
+        </button>
+      </div>
+
+      <div *ngIf="cargandoVet" class="loading">Cargando...</div>
+
+      <!-- ── Tab: Consultas ── -->
+      <div *ngIf="!cargandoVet && tabVet === 'consultas'" class="panel">
+        <div class="panel-header">
+          <h2>Consultas veterinarias</h2>
+          <button class="btn-primary" (click)="abrirFormConsulta()">+ Nueva consulta</button>
+        </div>
+
+        <div *ngIf="consultas.length === 0" class="empty">
+          No hay consultas registradas todavía.
+        </div>
+
+        <table *ngIf="consultas.length > 0" class="table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Mascota</th>
+              <th>Veterinario</th>
+              <th>Motivo</th>
+              <th>Diagnóstico</th>
+              <th>Tratamiento</th>
+              <th *ngIf="esAdmin"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of consultas">
+              <td>{{ c.fecha | date:'dd/MM/yy HH:mm' }}</td>
+              <td><strong>{{ c.mascota_nombre }}</strong></td>
+              <td>
+                {{ c.veterinario_nombre || '—' }}
+                <small *ngIf="c.especialidad">({{ c.especialidad }})</small>
+              </td>
+              <td>{{ c.motivo }}</td>
+              <td>{{ c.diagnostico || '—' }}</td>
+              <td>{{ c.tratamiento || '—' }}</td>
+              <td *ngIf="esAdmin">
+                <button class="btn-danger-sm" (click)="eliminarConsulta(c.id)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── Tab: Veterinarios ── -->
+      <div *ngIf="!cargandoVet && tabVet === 'veterinarios'" class="panel">
+        <div class="panel-header">
+          <h2>Lista de veterinarios</h2>
+          <button class="btn-primary" (click)="abrirFormVet()" *ngIf="esAdmin">+ Nuevo veterinario</button>
+        </div>
+
+        <div *ngIf="veterinarios.length === 0" class="empty">No hay veterinarios registrados.</div>
+
+        <div *ngIf="veterinarios.length > 0" class="vet-grid">
+          <div *ngFor="let v of veterinarios" class="vet-card" [class.inactivo]="!v.activo">
+            <div class="vet-avatar">{{ v.nombre[0] }}</div>
+            <div class="vet-info">
+              <strong>{{ v.nombre }}</strong>
+              <span class="vet-esp">{{ v.especialidad || 'Sin especialidad' }}</span>
+              <small *ngIf="v.telefono">📞 {{ v.telefono }}</small>
+              <small *ngIf="v.email">✉️ {{ v.email }}</small>
+            </div>
+            <div class="vet-actions" *ngIf="esAdmin">
+              <span class="estado" [ngClass]="v.activo ? 'estado-disponible' : 'estado-adoptado'">
+                {{ v.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+              <button class="link-btn" (click)="toggleVet(v)">
+                {{ v.activo ? 'Desactivar' : 'Activar' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Modal nueva consulta ── -->
+    <div class="modal-overlay" *ngIf="mostrarFormConsulta" (click)="mostrarFormConsulta = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Nueva consulta veterinaria</h3>
+        <div class="form">
+          <label>
+            Mascota *
+            <select [(ngModel)]="nuevaConsulta.mascota_id" name="mascota">
+              <option [ngValue]="0">-- Selecciona --</option>
+              <option *ngFor="let m of mascotas" [ngValue]="m.id">
+                {{ m.nombre }} ({{ m.raza_nombre }})
+              </option>
+            </select>
+          </label>
+          <label>
+            Veterinario
+            <select [(ngModel)]="nuevaConsulta.veterinario_id" name="vet">
+              <option [ngValue]="undefined">-- Sin asignar --</option>
+              <option *ngFor="let v of veterinarios" [ngValue]="v.id">
+                {{ v.nombre }}
+              </option>
+            </select>
+          </label>
+          <label>
+            Fecha y hora
+            <input type="datetime-local" [(ngModel)]="nuevaConsulta.fecha" name="fecha">
+          </label>
+          <label>
+            Motivo *
+            <input type="text" [(ngModel)]="nuevaConsulta.motivo" name="motivo" placeholder="Ej: chequeo general">
+          </label>
+          <label>
+            Diagnóstico
+            <input type="text" [(ngModel)]="nuevaConsulta.diagnostico" name="dx">
+          </label>
+          <label>
+            Tratamiento
+            <input type="text" [(ngModel)]="nuevaConsulta.tratamiento" name="tx">
+          </label>
+          <label>
+            Notas
+            <textarea rows="3" [(ngModel)]="nuevaConsulta.notas" name="notas"></textarea>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="mostrarFormConsulta = false">Cancelar</button>
+          <button class="btn-primary" (click)="guardarConsulta()">Guardar consulta</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Modal nuevo veterinario ── -->
+    <div class="modal-overlay" *ngIf="mostrarFormVet" (click)="mostrarFormVet = false">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Nuevo veterinario</h3>
+        <div class="form">
+          <label>
+            Nombre *
+            <input type="text" [(ngModel)]="nuevoVet.nombre" name="vnombre">
+          </label>
+          <label>
+            Especialidad
+            <input type="text" [(ngModel)]="nuevoVet.especialidad" name="vesp">
+          </label>
+          <label>
+            Teléfono
+            <input type="text" [(ngModel)]="nuevoVet.telefono" name="vtel">
+          </label>
+          <label>
+            Email
+            <input type="email" [(ngModel)]="nuevoVet.email" name="vemail">
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-secondary" (click)="mostrarFormVet = false">Cancelar</button>
+          <button class="btn-primary" (click)="guardarVet()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

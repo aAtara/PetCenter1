@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Mascota, Raza } from '../models/mascotamodel';
 import { Solicitud, CrearSolicitud } from '../models/solicitudmodel';
+import { Veterinario, CrearVeterinario, Consulta, CrearConsulta, ConsultaDetalle } from '../models/veterinariomodel';
 
 export interface Usuario {
   id: number;
@@ -85,5 +86,49 @@ export class PetcenterService {
     const datos: Partial<Solicitud> = { estado };
     if (comentarios) datos.comentarios_admin = comentarios;
     return this.http.patch(`${this.apiUrl}/solicitudes?id=eq.${id}`, datos);
+  }
+
+  // ─── VETERINARIOS ─────────────────────────────────────────
+
+  getVeterinarios(): Observable<Veterinario[]> {
+    return this.http.get<Veterinario[]>(`${this.apiUrl}/veterinarios?order=nombre`);
+  }
+
+  getVeterinariosActivos(): Observable<Veterinario[]> {
+    return this.http.get<Veterinario[]>(`${this.apiUrl}/veterinarios?activo=eq.true&order=nombre`);
+  }
+
+  crearVeterinario(vet: CrearVeterinario): Observable<any> {
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.post(`${this.apiUrl}/veterinarios`, vet, { headers });
+  }
+
+  actualizarVeterinario(id: number, datos: Partial<Veterinario>): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/veterinarios?id=eq.${id}`, datos);
+  }
+
+  eliminarVeterinario(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/veterinarios?id=eq.${id}`);
+  }
+
+  // ─── CONSULTAS VETERINARIAS ───────────────────────────────
+
+  getConsultas(): Observable<ConsultaDetalle[]> {
+    return this.http.get<ConsultaDetalle[]>(`${this.apiUrl}/consultas_detalle`);
+  }
+
+  getConsultasPorMascota(mascotaId: number): Observable<ConsultaDetalle[]> {
+    return this.http.get<ConsultaDetalle[]>(
+      `${this.apiUrl}/consultas_detalle?mascota_id=eq.${mascotaId}`
+    );
+  }
+
+  crearConsulta(consulta: CrearConsulta): Observable<any> {
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.post(`${this.apiUrl}/consultas_veterinarias`, consulta, { headers });
+  }
+
+  eliminarConsulta(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/consultas_veterinarias?id=eq.${id}`);
   }
 }
