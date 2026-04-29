@@ -1,0 +1,23 @@
+<div class="portal-root">
+  <!-- NAV -->
+  <nav class="navbar">
+    <a class="navbar-brand" routerLink="/">
+      <div class="brand-icon">🐾</div>
+      <div class="brand-name">Pet<span>Center</span></div>
+    </a>
+    <div class="navbar-links">
+      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+      <a class="nav-link" routerLink="/cita" routerLinkActive="active">Cita Veterinaria</a>
+      <a class="btn-nav-cta" routerLink="/adopcion">Ver Mascotas →</a>
+    </div>
+  </nav>
+
+  <!-- Vistas (cambian con la ruta) -->
+  <router-outlet></router-outlet>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>PetCenter © 2025 — Refugio de Adopción de Mascotas · Hecho con <span>❤️</span> en Chihuahua, Méx.</div>
+    <a class="staff-access" routerLink="/login">Acceso staff →</a>
+  </footer>
+</div>

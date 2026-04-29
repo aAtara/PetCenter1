@@ -1,0 +1,121 @@
+<div class="page-hero">
+  <h1>🐾 Encuentra a tu Compañero Ideal</h1>
+  <p>Todas nuestras mascotas están vacunadas, desparasitadas y listas para un nuevo hogar</p>
+</div>
+
+<div class="adopcion-container">
+  <a class="back-btn" routerLink="/">← Volver al Inicio</a>
+
+  <!-- Filtros -->
+  <div class="filter-bar">
+    <button class="filter-btn" [class.active]="filtro === 'todos'"  (click)="filtro = 'todos'">🐾 Todos</button>
+    <button class="filter-btn" [class.active]="filtro === 'perro'"  (click)="filtro = 'perro'">🐶 Perros</button>
+    <button class="filter-btn" [class.active]="filtro === 'gato'"   (click)="filtro = 'gato'">🐱 Gatos</button>
+    <button class="filter-btn" [class.active]="filtro === 'conejo'" (click)="filtro = 'conejo'">🐰 Conejos</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="cargando" class="empty-state">Cargando mascotas...</div>
+
+  <!-- Sin resultados -->
+  <div *ngIf="!cargando && mascotasFiltradas.length === 0" class="empty-state">
+    No hay mascotas en esta categoría por el momento.
+  </div>
+
+  <!-- Grid -->
+  <div *ngIf="!cargando" class="pets-grid">
+    <div class="pet-card" *ngFor="let m of mascotasFiltradas">
+      <div class="pet-photo" [style.background]="bgEspecie(m.raza_especie)">
+        {{ emojiEspecie(m.raza_especie) }}
+        <span class="estado-dot">
+          <span class="chip"
+                [style.background]="m.estado === 'disponible' ? '#d1fae5' : '#fef3c7'"
+                [style.color]="m.estado === 'disponible' ? '#065f46' : '#92400e'">
+            {{ m.estado === 'disponible' ? '✅ Disponible' : '⏳ ' + (m.estado || '').replace('_',' ') }}
+          </span>
+        </span>
+      </div>
+      <div class="pet-body">
+        <div class="pet-header">
+          <div class="pet-nombre">{{ m.nombre }}</div>
+          <div class="pet-especie">{{ m.raza_nombre || m.raza_especie }}</div>
+        </div>
+        <div class="pet-chips">
+          <span class="chip">📅 {{ m.edad_meses }} meses</span>
+          <span class="chip">{{ m.genero === 'macho' ? '♂ Macho' : '♀ Hembra' }}</span>
+        </div>
+        <div class="pet-desc">{{ m.descripcion || 'Una mascota lista para encontrar un nuevo hogar.' }}</div>
+        <button class="btn-adoptar"
+                [disabled]="m.estado !== 'disponible'"
+                (click)="abrirModal(m)">
+          {{ m.estado === 'disponible' ? '❤️ Quiero Adoptarlo' : '⏳ No disponible' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ADOPCIÓN -->
+<div class="modal-overlay" [class.open]="modalAbierto" (click)="cerrarModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+
+    <!-- Formulario -->
+    <div *ngIf="!modalExito">
+      <h3>{{ emojiEspecie(mascotaSeleccionada?.raza_especie) }} Solicitud para {{ mascotaSeleccionada?.nombre }}</h3>
+      <div class="modal-sub">{{ mascotaSeleccionada?.raza_nombre }} · Completa tus datos y nos pondremos en contacto</div>
+
+      <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
+
+      <div class="form-group">
+        <label>Nombre Completo</label>
+        <input type="text" [(ngModel)]="form.nombre" placeholder="Tu nombre">
+      </div>
+      <div class="form-group">
+        <label>Correo Electrónico</label>
+        <input type="email" [(ngModel)]="form.email" placeholder="tu@email.com">
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="form.telefono" placeholder="614-100-2233">
+        </div>
+        <div class="form-group">
+          <label>Ciudad</label>
+          <input type="text" [(ngModel)]="form.ciudad" placeholder="Tu ciudad">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Vivienda</label>
+        <select [(ngModel)]="form.vivienda">
+          <option value="">Selecciona</option>
+          <option>Casa con jardín</option>
+          <option>Casa sin jardín</option>
+          <option>Departamento</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>¿Tienes mascotas previas?</label>
+        <select [(ngModel)]="form.prev">
+          <option value="">Selecciona</option>
+          <option>Sí</option>
+          <option>No</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-submit" (click)="enviarSolicitud()" [disabled]="enviando">
+          {{ enviando ? 'Enviando...' : 'Enviar Solicitud →' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Éxito -->
+    <div *ngIf="modalExito" class="success-overlay">
+      <div class="success-icon">🐾</div>
+      <h4>¡Solicitud Enviada!</h4>
+      <p>Hemos recibido tu solicitud de adopción. Nuestro equipo revisará tu perfil y te contactará en un máximo de 48 horas.</p>
+      <button class="btn-submit full" (click)="cerrarModal()">Perfecto, ¡gracias!</button>
+    </div>
+  </div>
+</div>

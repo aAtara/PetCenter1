@@ -1,0 +1,169 @@
+/* Variables compartidas del portal */
+.portal-root {
+  --red: #dc2626;
+  --red-hover: #b91c1c;
+  --red-light: #fee2e2;
+  --dark: #0f172a;
+  --dark2: #1e293b;
+  --bg: #f1f5f9;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --card-radius: 14px;
+  --btn-radius: 8px;
+  --white: #fff;
+
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.portal-root *, .portal-root *::before, .portal-root *::after {
+  box-sizing: border-box;
+}
+
+/* ── NAV ── */
+.portal-root .navbar {
+  background: var(--dark);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.portal-root .navbar-brand {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; cursor: pointer;
+}
+.portal-root .brand-icon {
+  width: 34px; height: 34px;
+  background: var(--red); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.portal-root .brand-name { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+.portal-root .brand-name span { color: var(--red); }
+
+.portal-root .navbar-links { display: flex; align-items: center; gap: 6px; }
+.portal-root .nav-link {
+  padding: 7px 14px; font-size: 13px; color: #94a3b8;
+  background: none; border: none; border-radius: 7px;
+  cursor: pointer; transition: color .15s, background .15s;
+  font-family: inherit; text-decoration: none;
+}
+.portal-root .nav-link:hover, .portal-root .nav-link.active {
+  color: #f1f5f9; background: #1e293b;
+}
+.portal-root .btn-nav-cta {
+  padding: 7px 16px; background: var(--red); color: #fff;
+  border: none; border-radius: var(--btn-radius);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: background .15s;
+  text-decoration: none;
+}
+.portal-root .btn-nav-cta:hover { background: var(--red-hover); }
+
+/* ── BACK BUTTON ── */
+.portal-root .back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--muted);
+  background: none; border: none; cursor: pointer;
+  padding: 0; font-family: inherit;
+  margin-bottom: 32px; text-decoration: none;
+}
+.portal-root .back-btn:hover { color: var(--text); }
+
+/* ── BUTTONS ── */
+.portal-root .btn-primary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 13px 26px; background: var(--red); color: #fff;
+  border: none; border-radius: var(--btn-radius);
+  font-size: 14px; font-weight: 700; cursor: pointer;
+  font-family: inherit; transition: background .15s, transform .1s;
+}
+.portal-root .btn-primary:hover { background: var(--red-hover); transform: translateY(-1px); }
+.portal-root .btn-secondary {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 13px 26px; background: rgba(255,255,255,0.08); color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.2); border-radius: var(--btn-radius);
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: background .15s;
+}
+.portal-root .btn-secondary:hover { background: rgba(255,255,255,0.14); }
+
+/* ── PAGE HERO (vistas internas) ── */
+.portal-root .page-hero {
+  background: var(--dark); padding: 40px 40px 48px; text-align: center;
+}
+.portal-root .page-hero h1 {
+  font-size: 28px; font-weight: 800; color: #f1f5f9; margin-bottom: 6px;
+}
+.portal-root .page-hero p { font-size: 13px; color: #64748b; }
+
+/* ── SECTION ── */
+.portal-root .section {
+  padding: 60px 40px; max-width: 1100px; margin: 0 auto;
+}
+.portal-root .section-header { text-align: center; margin-bottom: 40px; }
+.portal-root .section-header h2 {
+  font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px;
+}
+.portal-root .section-header p {
+  font-size: 14px; color: var(--muted); text-wrap: pretty;
+}
+
+/* ── FORM SHARED ── */
+.portal-root .form-group { margin-bottom: 14px; }
+.portal-root .form-group label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text); margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.portal-root .form-group input,
+.portal-root .form-group textarea,
+.portal-root .form-group select {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  font-size: 13px; color: var(--text); font-family: inherit;
+  background: #fafafa; outline: none; transition: border-color .15s;
+}
+.portal-root .form-group input:focus,
+.portal-root .form-group textarea:focus,
+.portal-root .form-group select:focus {
+  border-color: var(--red); background: #fff;
+}
+.portal-root .form-group input::placeholder,
+.portal-root .form-group textarea::placeholder { color: #cbd5e1; }
+.portal-root .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* ── CHIPS ── */
+.portal-root .chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 600;
+  background: #f1f5f9; color: #475569;
+}
+
+/* ── FOOTER ── */
+.portal-root .footer {
+  background: var(--dark); color: #475569;
+  text-align: center; padding: 20px 40px; font-size: 12px;
+  display: flex; align-items: center; justify-content: center; gap: 24px;
+  flex-wrap: wrap;
+}
+.portal-root .footer span { color: var(--red); }
+.portal-root .staff-access {
+  color: #64748b; text-decoration: none; font-size: 11px;
+  border-left: 1px solid #1e293b; padding-left: 24px;
+}
+.portal-root .staff-access:hover { color: #94a3b8; }
+
+@media (max-width: 600px) {
+  .portal-root .section { padding: 40px 20px; }
+  .portal-root .navbar { padding: 0 16px; }
+  .portal-root .form-grid-2 { grid-template-columns: 1fr; }
+}

@@ -14,7 +14,19 @@ interface Stats {
   consultas: number;
 }
 
-type Seccion = 'inicio' | 'mascotas' | 'solicitudes' | 'veterinario';
+type Seccion =
+  | 'inicio'
+  | 'mascotas_completo'
+  | 'mascotas_disponibles'
+  | 'estadisticas'
+  | 'solicitudes_pendientes'
+  | 'adoptantes'
+  | 'veterinario'
+  | 'historial_mascota'
+  | 'mascotas'
+  | 'solicitudes';
+
+type TabHist = 'resumen' | 'consultas' | 'tratamientos' | 'vacunacion' | 'galeria';
 
 @Component({
   selector: 'app-dashboard',
@@ -47,14 +59,22 @@ export class DashboardComponent implements OnInit {
 
   mensaje = '';
 
+  // Barra lateral plegable
+  sidebarCollapsed = false;
+
+  // Historial mascota - tab activo y filas expandidas
+  tabHist: TabHist = 'resumen';
+  filasExpandidas: Record<string, boolean> = { r1: true };
+
+  toggleFila(id: string) {
+    this.filasExpandidas[id] = !this.filasExpandidas[id];
+  }
+
   constructor(private router: Router, private petService: PetcenterService) {}
 
   ngOnInit() {
     const raw = sessionStorage.getItem('usuario');
-    if (!raw) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!raw) { this.router.navigate(['/login']); return; }
     this.usuario = JSON.parse(raw);
     this.cargarDatos();
   }
@@ -64,24 +84,20 @@ export class DashboardComponent implements OnInit {
     this.petService.getMascotasDetalle().subscribe({
       next: (mascotas) => {
         this.mascotas = mascotas;
-        this.stats.total = mascotas.length;
+        this.stats.total       = mascotas.length;
         this.stats.disponibles = mascotas.filter(m => m.estado === 'disponible').length;
-        this.stats.enProceso = mascotas.filter(m => m.estado === 'en_proceso').length;
-        this.stats.adoptados = mascotas.filter(m => m.estado === 'adoptado').length;
-        this.ultimasMascotas = [...mascotas]
+        this.stats.enProceso   = mascotas.filter(m => m.estado === 'en_proceso').length;
+        this.stats.adoptados   = mascotas.filter(m => m.estado === 'adoptado').length;
+        this.ultimasMascotas   = [...mascotas]
           .sort((a, b) => new Date(b.fecha_ingreso).getTime() - new Date(a.fecha_ingreso).getTime())
           .slice(0, 5);
         this.cargando = false;
       },
       error: () => { this.cargando = false; }
     });
-
     this.petService.getSolicitudes().subscribe({
-      next: (sols) => {
-        this.stats.solicitudesPendientes = sols.filter(s => s.estado === 'pendiente').length;
-      }
+      next: (sols) => { this.stats.solicitudesPendientes = sols.filter(s => s.estado === 'pendiente').length; }
     });
-
     this.petService.getConsultas().subscribe({
       next: (c) => { this.stats.consultas = c.length; }
     });
@@ -94,101 +110,51 @@ export class DashboardComponent implements OnInit {
 
   cargarVeterinario() {
     this.cargandoVet = true;
-    this.petService.getVeterinarios().subscribe({
-      next: (v) => { this.veterinarios = v; }
-    });
+    this.petService.getVeterinarios().subscribe({ next: (v) => { this.veterinarios = v; } });
     this.petService.getConsultas().subscribe({
       next: (c) => { this.consultas = c; this.cargandoVet = false; },
       error: () => { this.cargandoVet = false; }
     });
   }
 
-  // ─── Consulta ───
   consultaVacia(): CrearConsulta {
-    return {
-      mascota_id: 0,
-      veterinario_id: undefined,
-      fecha: new Date().toISOString().slice(0, 16),
-      motivo: '',
-      diagnostico: '',
-      tratamiento: '',
-      notas: ''
-    };
+    return { mascota_id: 0, veterinario_id: undefined, fecha: new Date().toISOString().slice(0, 16), motivo: '', diagnostico: '', tratamiento: '', notas: '' };
   }
 
-  abrirFormConsulta() {
-    this.nuevaConsulta = this.consultaVacia();
-    this.mostrarFormConsulta = true;
-  }
+  abrirFormConsulta() { this.nuevaConsulta = this.consultaVacia(); this.mostrarFormConsulta = true; }
 
   guardarConsulta() {
-    if (!this.nuevaConsulta.mascota_id || !this.nuevaConsulta.motivo) {
-      this.mensaje = 'Selecciona una mascota e indica el motivo.';
-      return;
-    }
-    const payload: CrearConsulta = {
-      ...this.nuevaConsulta,
-      mascota_id: Number(this.nuevaConsulta.mascota_id),
-      veterinario_id: this.nuevaConsulta.veterinario_id ? Number(this.nuevaConsulta.veterinario_id) : undefined
-    };
+    if (!this.nuevaConsulta.mascota_id || !this.nuevaConsulta.motivo) { this.mensaje = 'Selecciona una mascota e indica el motivo.'; return; }
+    const payload: CrearConsulta = { ...this.nuevaConsulta, mascota_id: Number(this.nuevaConsulta.mascota_id), veterinario_id: this.nuevaConsulta.veterinario_id ? Number(this.nuevaConsulta.veterinario_id) : undefined };
     this.petService.crearConsulta(payload).subscribe({
-      next: () => {
-        this.mostrarFormConsulta = false;
-        this.mensaje = 'Consulta registrada ✅';
-        this.cargarVeterinario();
-        setTimeout(() => this.mensaje = '', 2500);
-      },
+      next: () => { this.mostrarFormConsulta = false; this.mensaje = 'Consulta registrada ✅'; this.cargarVeterinario(); setTimeout(() => this.mensaje = '', 2500); },
       error: () => { this.mensaje = 'Error al guardar la consulta.'; }
     });
   }
 
   eliminarConsulta(id: number) {
     if (!confirm('¿Eliminar esta consulta?')) return;
-    this.petService.eliminarConsulta(id).subscribe({
-      next: () => this.cargarVeterinario()
-    });
+    this.petService.eliminarConsulta(id).subscribe({ next: () => this.cargarVeterinario() });
   }
 
-  // ─── Veterinario ───
-  vetVacio(): CrearVeterinario {
-    return { nombre: '', especialidad: '', telefono: '', email: '', activo: true };
-  }
-
-  abrirFormVet() {
-    this.nuevoVet = this.vetVacio();
-    this.mostrarFormVet = true;
-  }
+  vetVacio(): CrearVeterinario { return { nombre: '', especialidad: '', telefono: '', email: '', activo: true }; }
+  abrirFormVet() { this.nuevoVet = this.vetVacio(); this.mostrarFormVet = true; }
 
   guardarVet() {
-    if (!this.nuevoVet.nombre) {
-      this.mensaje = 'El nombre del veterinario es obligatorio.';
-      return;
-    }
+    if (!this.nuevoVet.nombre) { this.mensaje = 'El nombre es obligatorio.'; return; }
     this.petService.crearVeterinario(this.nuevoVet).subscribe({
-      next: () => {
-        this.mostrarFormVet = false;
-        this.mensaje = 'Veterinario registrado ✅';
-        this.cargarVeterinario();
-        setTimeout(() => this.mensaje = '', 2500);
-      },
+      next: () => { this.mostrarFormVet = false; this.mensaje = 'Veterinario registrado ✅'; this.cargarVeterinario(); setTimeout(() => this.mensaje = '', 2500); },
       error: () => { this.mensaje = 'Error al guardar el veterinario.'; }
     });
   }
 
   toggleVet(v: Veterinario) {
-    this.petService.actualizarVeterinario(v.id, { activo: !v.activo }).subscribe({
-      next: () => this.cargarVeterinario()
-    });
+    this.petService.actualizarVeterinario(v.id, { activo: !v.activo }).subscribe({ next: () => this.cargarVeterinario() });
   }
 
-  // ─── Sesión ───
-  cerrarSesion() {
-    sessionStorage.removeItem('usuario');
-    this.router.navigate(['/login']);
-  }
+  cerrarSesion() { sessionStorage.removeItem('usuario'); this.router.navigate(['/login']); }
 
   get esAdmin(): boolean { return this.usuario?.rol === 'admin'; }
-
   get iniciales(): string {
     if (!this.usuario?.nombre) return '?';
     return this.usuario.nombre.split(' ').map(p => p[0]).slice(0, 2).join('').toUpperCase();

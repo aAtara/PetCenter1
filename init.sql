@@ -64,6 +64,23 @@ CREATE TABLE IF NOT EXISTS consultas_veterinarias (
   notas           TEXT
 );
 
+-- Tabla: citas (reservas públicas de cita veterinaria)
+CREATE TABLE IF NOT EXISTS citas (
+  id              SERIAL PRIMARY KEY,
+  veterinario_id  INT REFERENCES veterinarios(id),
+  nombre_dueno    TEXT NOT NULL,
+  nombre_mascota  TEXT,
+  email           TEXT NOT NULL,
+  telefono        TEXT,
+  fecha           DATE NOT NULL,
+  hora            TEXT NOT NULL,
+  tipo_mascota    TEXT,
+  motivo          TEXT,
+  estado          TEXT NOT NULL DEFAULT 'pendiente'
+                  CHECK (estado IN ('pendiente','confirmada','cancelada','completada')),
+  creado_en       TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- ============================================================
 -- Datos de ejemplo
 -- ============================================================

@@ -1,41 +1,82 @@
 <div class="dashboard">
-  <!-- Sidebar -->
-  <aside class="sidebar">
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="brand">
       <div class="brand-logo">🐾</div>
-      <div class="brand-text">
+      <div class="brand-text" *ngIf="!sidebarCollapsed">
         <h2>PetCenter</h2>
         <span>Panel de control</span>
       </div>
+      <button class="collapse-btn" (click)="sidebarCollapsed = !sidebarCollapsed">
+        {{ sidebarCollapsed ? '›' : '‹' }}
+      </button>
     </div>
 
     <nav class="nav">
-      <button class="nav-item" [class.active]="seccionActiva === 'inicio'" (click)="irA('inicio')">
-        <span class="icon">🏠</span> Inicio
+
+      <!-- TODOS LOS ROLES -->
+      <div class="nav-group" *ngIf="!sidebarCollapsed">
+        <span class="nav-group-label">🌐 Todos los roles</span>
+      </div>
+      <button class="nav-item" [class.active]="seccionActiva === 'mascotas_completo'" (click)="irA('mascotas_completo')" title="Listado completo">
+        <span class="icon">📋</span><span *ngIf="!sidebarCollapsed">Listado completo</span>
       </button>
-      <button class="nav-item" [class.active]="seccionActiva === 'mascotas'" (click)="irA('mascotas')">
-        <span class="icon">🐶</span> Mascotas
+      <button class="nav-item" [class.active]="seccionActiva === 'mascotas_disponibles'" (click)="irA('mascotas_disponibles')" title="Mascotas disponibles">
+        <span class="icon">🏠</span><span *ngIf="!sidebarCollapsed">Disponibles</span>
       </button>
-      <button class="nav-item" [class.active]="seccionActiva === 'solicitudes'" (click)="irA('solicitudes')">
-        <span class="icon">📋</span> Solicitudes
+      <button class="nav-item" [class.active]="seccionActiva === 'estadisticas'" (click)="irA('estadisticas')" title="Estadísticas">
+        <span class="icon">📊</span><span *ngIf="!sidebarCollapsed">Estadísticas</span>
       </button>
-      <button class="nav-item" [class.active]="seccionActiva === 'veterinario'" (click)="irA('veterinario')">
-        <span class="icon">🩺</span> Veterinario
+
+      <!-- TRABAJADOR -->
+      <div class="nav-group" *ngIf="!sidebarCollapsed">
+        <span class="nav-group-label worker">🟠 Trabajador</span>
+      </div>
+      <button class="nav-item" [class.active]="seccionActiva === 'solicitudes_pendientes'" (click)="irA('solicitudes_pendientes')" title="Solicitudes pendientes">
+        <span class="icon">📝</span><span *ngIf="!sidebarCollapsed">Solicitudes</span>
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'adoptantes'" (click)="irA('adoptantes')" title="Historial adoptantes">
+        <span class="icon">👤</span><span *ngIf="!sidebarCollapsed">Adoptantes</span>
+      </button>
+
+      <!-- VETERINARIO -->
+      <div class="nav-group" *ngIf="!sidebarCollapsed">
+        <span class="nav-group-label vet">🩺 Veterinario</span>
+      </div>
+      <button class="nav-item" [class.active]="seccionActiva === 'veterinario'" (click)="irA('veterinario')" title="Veterinario">
+        <span class="icon">🩺</span><span *ngIf="!sidebarCollapsed">Consultas</span>
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'historial_mascota'" (click)="irA('historial_mascota')" title="Historial mascota">
+        <span class="icon">📑</span><span *ngIf="!sidebarCollapsed">Historial mascota</span>
+      </button>
+
+      <!-- ADMIN -->
+      <div class="nav-group" *ngIf="!sidebarCollapsed">
+        <span class="nav-group-label admin">⚙️ Admin</span>
+      </div>
+      <button class="nav-item" [class.active]="seccionActiva === 'inicio'" (click)="irA('inicio')" title="Resumen">
+        <span class="icon">🏠</span><span *ngIf="!sidebarCollapsed">Resumen</span>
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'mascotas'" (click)="irA('mascotas')" title="Gestión mascotas">
+        <span class="icon">🐶</span><span *ngIf="!sidebarCollapsed">Mascotas</span>
+      </button>
+      <button class="nav-item" [class.active]="seccionActiva === 'solicitudes'" (click)="irA('solicitudes')" title="Gestión solicitudes">
+        <span class="icon">📂</span><span *ngIf="!sidebarCollapsed">Solicitudes</span>
       </button>
     </nav>
 
-    <button class="logout" (click)="cerrarSesion()">
-      <span class="icon">🚪</span> Cerrar sesión
+    <button class="logout" (click)="cerrarSesion()" title="Cerrar sesión">
+      <span class="icon">🚪</span><span *ngIf="!sidebarCollapsed">Cerrar sesión</span>
     </button>
   </aside>
 
-  <!-- Contenido principal -->
+  <!-- ══════════ MAIN ══════════ -->
   <main class="main">
     <header class="top-bar">
       <div>
         <h1>Hola, {{ usuario?.nombre }} 👋</h1>
-        <p class="subtitle">
-          Bienvenido al panel
+        <p class="subtitle">Bienvenido al panel
           <span class="rol-badge" [class.admin]="esAdmin">{{ usuario?.rol }}</span>
         </p>
       </div>
@@ -48,88 +89,51 @@
       </div>
     </header>
 
-    <!-- Sección Inicio -->
+    <!-- ══════════ INICIO ══════════ -->
     <section *ngIf="seccionActiva === 'inicio'" class="content">
       <div *ngIf="cargando" class="loading">Cargando datos...</div>
-
       <div *ngIf="!cargando">
-        <!-- Tarjetas de estadísticas -->
         <div class="stats-grid">
           <div class="stat-card total">
             <div class="stat-icon">🐾</div>
-            <div class="stat-info">
-              <span class="stat-label">Total mascotas</span>
-              <span class="stat-value">{{ stats.total }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">Total mascotas</span><span class="stat-value">{{ stats.total }}</span></div>
           </div>
           <div class="stat-card disponible">
             <div class="stat-icon">✅</div>
-            <div class="stat-info">
-              <span class="stat-label">Disponibles</span>
-              <span class="stat-value">{{ stats.disponibles }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">Disponibles</span><span class="stat-value">{{ stats.disponibles }}</span></div>
           </div>
           <div class="stat-card proceso">
             <div class="stat-icon">⏳</div>
-            <div class="stat-info">
-              <span class="stat-label">En proceso</span>
-              <span class="stat-value">{{ stats.enProceso }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">En proceso</span><span class="stat-value">{{ stats.enProceso }}</span></div>
           </div>
           <div class="stat-card adoptado">
             <div class="stat-icon">❤️</div>
-            <div class="stat-info">
-              <span class="stat-label">Adoptados</span>
-              <span class="stat-value">{{ stats.adoptados }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">Adoptados</span><span class="stat-value">{{ stats.adoptados }}</span></div>
           </div>
           <div class="stat-card solicitudes">
             <div class="stat-icon">📨</div>
-            <div class="stat-info">
-              <span class="stat-label">Solicitudes pendientes</span>
-              <span class="stat-value">{{ stats.solicitudesPendientes }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">Solicitudes pendientes</span><span class="stat-value">{{ stats.solicitudesPendientes }}</span></div>
           </div>
           <div class="stat-card consultas">
             <div class="stat-icon">🩺</div>
-            <div class="stat-info">
-              <span class="stat-label">Consultas veterinarias</span>
-              <span class="stat-value">{{ stats.consultas }}</span>
-            </div>
+            <div class="stat-info"><span class="stat-label">Consultas veterinarias</span><span class="stat-value">{{ stats.consultas }}</span></div>
           </div>
         </div>
-
-        <!-- Últimas mascotas -->
         <div class="panel">
           <div class="panel-header">
             <h2>Últimas mascotas ingresadas</h2>
-            <button class="link-btn" (click)="irA('mascotas')">Ver todas →</button>
+            <button class="link-btn" (click)="irA('mascotas_completo')">Ver todas →</button>
           </div>
-
           <div *ngIf="ultimasMascotas.length === 0" class="empty">No hay mascotas registradas.</div>
-
           <table *ngIf="ultimasMascotas.length > 0" class="table">
-            <thead>
-              <tr>
-                <th>Nombre</th>
-                <th>Raza</th>
-                <th>Edad</th>
-                <th>Género</th>
-                <th>Estado</th>
-                <th>Fecha ingreso</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Nombre</th><th>Raza</th><th>Edad</th><th>Género</th><th>Estado</th><th>Fecha ingreso</th></tr></thead>
             <tbody>
               <tr *ngFor="let m of ultimasMascotas">
                 <td><strong>{{ m.nombre }}</strong></td>
                 <td>{{ m.raza_nombre }} <small>({{ m.raza_especie }})</small></td>
                 <td>{{ m.edad_meses }} meses</td>
                 <td>{{ m.genero }}</td>
-                <td>
-                  <span class="estado" [ngClass]="'estado-' + m.estado">
-                    {{ m.estado.replace('_', ' ') }}
-                  </span>
-                </td>
+                <td><span class="estado" [ngClass]="'estado-' + m.estado">{{ m.estado.replace('_',' ') }}</span></td>
                 <td>{{ m.fecha_ingreso }}</td>
               </tr>
             </tbody>
@@ -138,88 +142,525 @@
       </div>
     </section>
 
-    <!-- Placeholder de secciones que ya se conectarán a tus componentes existentes -->
+    <!-- ══════════ LISTADO COMPLETO ══════════ -->
+    <section *ngIf="seccionActiva === 'mascotas_completo'" class="content">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">📋</span>
+          <div>
+            <h1>Listado Completo de Mascotas</h1>
+            <small class="view-sub">v_mascotas_completo — Todos los roles</small>
+          </div>
+        </div>
+        <span class="endpoint-badge">GET /v_mascotas_completo</span>
+      </div>
+
+      <div class="filtros-row">
+        <div class="filtros">
+          <button class="filtro active">Todos</button>
+          <button class="filtro">Disponibles</button>
+          <button class="filtro">En Proceso</button>
+          <button class="filtro">Adoptadas</button>
+        </div>
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" placeholder="Buscar mascota...">
+        </div>
+      </div>
+
+      <div class="panel">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>NOMBRE</th><th>ESPECIE</th><th>RAZA</th><th>SEXO</th>
+              <th>ESTADO</th><th>PESO</th><th>ESTERILIZADO</th><th>ÚLTIMA CONSULTA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Luna</strong></td><td>Gato</td><td>Siamés</td><td class="muted">Hembra</td>
+              <td><span class="estado estado-disponible">disponible</span></td>
+              <td>3.2 kg</td><td class="center">✅</td><td class="muted">12 Abr 2025</td>
+            </tr>
+            <tr>
+              <td><strong>Max</strong></td><td>Perro</td><td>Labrador</td><td class="muted">Macho</td>
+              <td><span class="estado estado-en_proceso">en_proceso</span></td>
+              <td>28.5 kg</td><td class="center">❌</td><td class="muted">20 Abr 2025</td>
+            </tr>
+            <tr>
+              <td><strong>Manchas</strong></td><td>Perro</td><td>Mestizo</td><td class="muted">Macho</td>
+              <td><span class="estado estado-disponible">disponible</span></td>
+              <td>12.1 kg</td><td class="center">✅</td><td class="muted">5 Abr 2025</td>
+            </tr>
+            <tr>
+              <td><strong>Nube</strong></td><td>Conejo</td><td class="muted">—</td><td class="muted">Hembra</td>
+              <td><span class="estado estado-disponible">disponible</span></td>
+              <td>1.8 kg</td><td class="center">❌</td><td class="muted">—</td>
+            </tr>
+            <tr>
+              <td><strong>Rocky</strong></td><td>Perro</td><td>Beagle</td><td class="muted">Macho</td>
+              <td><span class="estado estado-adoptado">adoptada</span></td>
+              <td>10.4 kg</td><td class="center">✅</td><td class="muted">1 Mar 2025</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ MASCOTAS DISPONIBLES ══════════ -->
+    <section *ngIf="seccionActiva === 'mascotas_disponibles'" class="content">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">🏠</span>
+          <div>
+            <h1>Mascotas Disponibles</h1>
+            <small class="view-sub">v_mascotas_disponibles — Catálogo público</small>
+          </div>
+        </div>
+        <span class="endpoint-badge green">GET /v_mascotas_disponibles</span>
+      </div>
+
+      <div class="filtros">
+        <button class="filtro active">Todos 🐾</button>
+        <button class="filtro">Perros 🐕</button>
+        <button class="filtro">Gatos 🐈</button>
+        <button class="filtro">Conejos 🐇</button>
+      </div>
+
+      <div class="catalogo-grid">
+        <div class="catalogo-card">
+          <div class="catalogo-img">🐱</div>
+          <div class="catalogo-body">
+            <h3>Luna</h3>
+            <p class="catalogo-sub">Siamés · 2 años</p>
+            <div class="tag-row">
+              <span class="tag gato">Gato</span>
+              <span class="tag hembra">Hembra</span>
+              <span class="tag esteril">Esterilizado</span>
+            </div>
+          </div>
+          <button class="btn-adoptar">Solicitar Adopción →</button>
+        </div>
+
+        <div class="catalogo-card">
+          <div class="catalogo-img">🐶</div>
+          <div class="catalogo-body">
+            <h3>Manchas</h3>
+            <p class="catalogo-sub">Mestizo · 1 año</p>
+            <div class="tag-row">
+              <span class="tag perro">Perro</span>
+              <span class="tag macho">Macho</span>
+              <span class="tag esteril">Esterilizado</span>
+            </div>
+          </div>
+          <button class="btn-adoptar">Solicitar Adopción →</button>
+        </div>
+
+        <div class="catalogo-card">
+          <div class="catalogo-img">🐰</div>
+          <div class="catalogo-body">
+            <h3>Nube</h3>
+            <p class="catalogo-sub">— · 8 meses</p>
+            <div class="tag-row">
+              <span class="tag conejo">Conejo</span>
+              <span class="tag hembra">Hembra</span>
+            </div>
+          </div>
+          <button class="btn-adoptar">Solicitar Adopción →</button>
+        </div>
+
+        <div class="catalogo-card">
+          <div class="catalogo-img">🐶</div>
+          <div class="catalogo-body">
+            <h3>Max</h3>
+            <p class="catalogo-sub">Labrador · 1 año</p>
+            <div class="tag-row">
+              <span class="tag perro">Perro</span>
+              <span class="tag macho">Macho</span>
+            </div>
+          </div>
+          <button class="btn-adoptar">Solicitar Adopción →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ ESTADÍSTICAS ══════════ -->
+    <section *ngIf="seccionActiva === 'estadisticas'" class="content">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">📊</span>
+          <div>
+            <h1>Dashboard General</h1>
+            <small class="view-sub">v_estadisticas_general — Admin / Todos</small>
+          </div>
+        </div>
+        <span class="endpoint-badge blue">GET /v_estadisticas_general</span>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-value green">47</span>
+          <span class="kpi-label">Mascotas Registradas</span>
+          <span class="kpi-sub">↑ 3 este mes</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value cyan">18</span>
+          <span class="kpi-label">Disponibles</span>
+          <span class="kpi-sub">38% del total</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value orange">11</span>
+          <span class="kpi-label">Adopciones este mes</span>
+          <span class="kpi-sub">↑ 22% vs marzo</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value yellow">6</span>
+          <span class="kpi-label">Solicitudes Pendientes</span>
+          <span class="kpi-sub">Requieren revisión</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-value pink">5</span>
+          <span class="kpi-label">Citas Hoy</span>
+          <span class="kpi-sub">3 programadas</span>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div class="charts-row">
+        <!-- Gráfico barras -->
+        <div class="panel chart-panel">
+          <h3>Adopciones por Mes</h3>
+          <div class="bar-chart">
+            <div class="bar-group">
+              <div class="bar" style="--h: 36%"><span class="bar-val">4</span></div>
+              <span class="bar-label">Nov</span>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="--h: 64%"><span class="bar-val">7</span></div>
+              <span class="bar-label">Dic</span>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="--h: 45%"><span class="bar-val">5</span></div>
+              <span class="bar-label">Ene</span>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="--h: 82%"><span class="bar-val">9</span></div>
+              <span class="bar-label">Feb</span>
+            </div>
+            <div class="bar-group">
+              <div class="bar" style="--h: 55%"><span class="bar-val">6</span></div>
+              <span class="bar-label">Mar</span>
+            </div>
+            <div class="bar-group">
+              <div class="bar highlight" style="--h: 100%"><span class="bar-val">11</span></div>
+              <span class="bar-label">Abr</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mascotas por estado -->
+        <div class="panel estado-panel">
+          <h3>Mascotas por Estado</h3>
+          <div class="estado-bars">
+            <div class="estado-row">
+              <span class="estado-name">Disponibles</span>
+              <div class="progress-bar"><div class="progress-fill green" style="width: 38%"></div></div>
+              <span class="estado-num">18</span>
+            </div>
+            <div class="estado-row">
+              <span class="estado-name">En proceso</span>
+              <div class="progress-bar"><div class="progress-fill yellow" style="width: 17%"></div></div>
+              <span class="estado-num">8</span>
+            </div>
+            <div class="estado-row">
+              <span class="estado-name">Adoptadas</span>
+              <div class="progress-bar"><div class="progress-fill purple" style="width: 34%"></div></div>
+              <span class="estado-num">16</span>
+            </div>
+            <div class="estado-row">
+              <span class="estado-name">En tratamiento</span>
+              <div class="progress-bar"><div class="progress-fill pink" style="width: 11%"></div></div>
+              <span class="estado-num">5</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ SOLICITUDES PENDIENTES ══════════ -->
+    <section *ngIf="seccionActiva === 'solicitudes_pendientes'" class="content">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">📝</span>
+          <div>
+            <h1>Solicitudes Pendientes</h1>
+            <small class="view-sub">v_solicitudes_pendientes — Trabajador / Admin</small>
+          </div>
+        </div>
+        <span class="endpoint-badge orange">GET /v_solicitudes_pendientes</span>
+      </div>
+
+      <!-- Mini KPIs -->
+      <div class="mini-kpi-row">
+        <div class="mini-kpi">
+          <span class="kpi-value yellow">2</span>
+          <span class="kpi-label">Pendientes</span>
+          <span class="kpi-sub">Requieren acción</span>
+        </div>
+        <div class="mini-kpi">
+          <span class="kpi-value green">1</span>
+          <span class="kpi-label">Aprobadas</span>
+          <span class="kpi-sub">Este mes</span>
+        </div>
+        <div class="mini-kpi">
+          <span class="kpi-value red">1</span>
+          <span class="kpi-label">Rechazadas</span>
+          <span class="kpi-sub">Este mes</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>MASCOTA</th><th>ADOPTANTE</th><th>TELÉFONO</th>
+              <th>FECHA</th><th>DÍAS</th><th>ESTADO</th><th>ACCIONES</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Luna</strong></td>
+              <td>Ana García</td>
+              <td class="muted">614-100-2233</td>
+              <td class="muted">24 Abr</td>
+              <td><span class="dias-badge yellow">3d</span></td>
+              <td><span class="estado estado-en_proceso">pendiente</span></td>
+              <td class="acciones"><button class="btn-approve">✓ Aprobar</button><button class="btn-reject">✗ Rechazar</button></td>
+            </tr>
+            <tr>
+              <td><strong>Manchas</strong></td>
+              <td>Luis Torres</td>
+              <td class="muted">614-555-9910</td>
+              <td class="muted">22 Abr</td>
+              <td><span class="dias-badge orange">5d</span></td>
+              <td><span class="estado estado-en_proceso">pendiente</span></td>
+              <td class="acciones"><button class="btn-approve">✓ Aprobar</button><button class="btn-reject">✗ Rechazar</button></td>
+            </tr>
+            <tr>
+              <td><strong>Nube</strong></td>
+              <td>Rosa Mendoza</td>
+              <td class="muted">614-321-7744</td>
+              <td class="muted">20 Abr</td>
+              <td><span class="dias-badge gray">7d</span></td>
+              <td><span class="estado estado-disponible">aprobada</span></td>
+              <td class="acciones">—</td>
+            </tr>
+            <tr>
+              <td><strong>Rocky</strong></td>
+              <td>Carlos Ramos</td>
+              <td class="muted">614-876-4321</td>
+              <td class="muted">18 Abr</td>
+              <td><span class="dias-badge red">9d</span></td>
+              <td><span class="estado estado-adoptado">rechazada</span></td>
+              <td class="acciones">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ══════════ HISTORIAL ADOPTANTES ══════════ -->
+    <section *ngIf="seccionActiva === 'adoptantes'" class="content">
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">👤</span>
+          <div>
+            <h1>Historial de Adoptantes</h1>
+            <small class="view-sub">v_adoptantes_historial — Trabajador / Admin</small>
+          </div>
+        </div>
+        <span class="endpoint-badge orange">GET /v_adoptantes_historial?id=...</span>
+      </div>
+
+      <div class="adoptante-layout">
+        <!-- Perfil -->
+        <div class="panel perfil-card">
+          <div class="perfil-avatar">AG</div>
+          <h3>Ana García</h3>
+          <p class="perfil-tel">614-100-2233</p>
+          <p class="perfil-email">ana&#64;email.com</p>
+          <span class="estado estado-disponible" style="display:inline-block;margin:8px 0">Activa</span>
+          <div class="perfil-datos">
+            <div class="perfil-row"><span>Ciudad</span><strong>Delicias, Chih.</strong></div>
+            <div class="perfil-row"><span>Vivienda</span><strong>Casa con jardín</strong></div>
+            <div class="perfil-row"><span>Mascotas previas</span><strong>Sí</strong></div>
+            <div class="perfil-row"><span>Solicitudes</span><strong>3 total</strong></div>
+          </div>
+        </div>
+
+        <!-- Historial -->
+        <div class="panel historial-panel">
+          <h3>Historial de Solicitudes</h3>
+          <div class="historial-list">
+            <div class="historial-item">
+              <div class="historial-info">
+                <strong>Luna (Gato)</strong>
+                <span class="historial-fecha">24 Abr 2025</span>
+                <span class="historial-nota">Primera solicitud, buen perfil</span>
+              </div>
+              <span class="estado estado-en_proceso">pendiente</span>
+            </div>
+            <div class="historial-item border-red">
+              <div class="historial-info">
+                <strong>Max (Perro)</strong>
+                <span class="historial-fecha">10 Mar 2025</span>
+                <span class="historial-nota">Departamento sin espacio suficiente</span>
+              </div>
+              <span class="estado estado-adoptado">rechazada</span>
+            </div>
+            <div class="historial-item border-green">
+              <div class="historial-info">
+                <strong>Manchas (Perro)</strong>
+                <span class="historial-fecha">05 Feb 2025</span>
+                <span class="historial-nota">Adopción completada exitosamente</span>
+              </div>
+              <span class="estado estado-disponible">aprobada</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════ GESTIÓN MASCOTAS (Admin) ══════════ -->
     <section *ngIf="seccionActiva === 'mascotas'" class="content">
-      <div class="panel">
-        <h2>Gestión de mascotas</h2>
-        <p class="hint">Aquí se integrará el componente <code>MascotasComponent</code>.</p>
+      <div class="section-header">
+        <div><h1>🐾 Gestión de mascotas</h1><p class="subtitle">Administra el registro de animales en el refugio</p></div>
+        <button class="btn-primary">+ Nueva mascota</button>
+      </div>
+      <div class="filtros">
+        <button class="filtro active">Todas</button>
+        <button class="filtro">✅ Disponibles</button>
+        <button class="filtro">⏳ En proceso</button>
+        <button class="filtro">❤️ Adoptados</button>
+      </div>
+      <div class="mascotas-grid">
+        <div class="mascota-card">
+          <div class="mc-top"><div class="mc-avatar perro">🐶</div><span class="estado estado-disponible">disponible</span></div>
+          <div class="mc-body"><h3>Max</h3><div class="mc-detail"><span>🦴 Raza</span><strong>Labrador</strong></div><div class="mc-detail"><span>📅 Edad</span><strong>12 meses</strong></div><div class="mc-detail"><span>⚥ Género</span><strong>Macho</strong></div><p class="mc-desc">Perro juguetón y amigable.</p></div>
+          <div class="mc-footer"><button class="btn-outline">Ver detalle</button><button class="btn-icon">✏️</button><button class="btn-icon danger">🗑️</button></div>
+        </div>
+        <div class="mascota-card">
+          <div class="mc-top"><div class="mc-avatar gato">🐱</div><span class="estado estado-disponible">disponible</span></div>
+          <div class="mc-body"><h3>Luna</h3><div class="mc-detail"><span>🦴 Raza</span><strong>Siamés</strong></div><div class="mc-detail"><span>📅 Edad</span><strong>8 meses</strong></div><div class="mc-detail"><span>⚥ Género</span><strong>Hembra</strong></div><p class="mc-desc">Gata tranquila y cariñosa.</p></div>
+          <div class="mc-footer"><button class="btn-outline">Ver detalle</button><button class="btn-icon">✏️</button><button class="btn-icon danger">🗑️</button></div>
+        </div>
+        <div class="mascota-card">
+          <div class="mc-top"><div class="mc-avatar perro">🐶</div><span class="estado estado-en_proceso">en proceso</span></div>
+          <div class="mc-body"><h3>Rocky</h3><div class="mc-detail"><span>🦴 Raza</span><strong>Beagle</strong></div><div class="mc-detail"><span>📅 Edad</span><strong>24 meses</strong></div><div class="mc-detail"><span>⚥ Género</span><strong>Macho</strong></div><p class="mc-desc">Muy activo, le gusta correr.</p></div>
+          <div class="mc-footer"><button class="btn-outline">Ver detalle</button><button class="btn-icon">✏️</button><button class="btn-icon danger">🗑️</button></div>
+        </div>
+        <div class="mascota-card">
+          <div class="mc-top"><div class="mc-avatar perro">🐶</div><span class="estado estado-adoptado">adoptado</span></div>
+          <div class="mc-body"><h3>Bruno</h3><div class="mc-detail"><span>🦴 Raza</span><strong>Golden Retriever</strong></div><div class="mc-detail"><span>📅 Edad</span><strong>18 meses</strong></div><div class="mc-detail"><span>⚥ Género</span><strong>Macho</strong></div><p class="mc-desc">Excelente con niños.</p></div>
+          <div class="mc-footer"><button class="btn-outline">Ver detalle</button><button class="btn-icon">✏️</button><button class="btn-icon danger">🗑️</button></div>
+        </div>
+        <div class="mascota-card add-card">
+          <div class="add-icon">＋</div><p>Registrar nueva mascota</p>
+        </div>
       </div>
     </section>
 
+    <!-- ══════════ GESTIÓN SOLICITUDES (Admin) ══════════ -->
     <section *ngIf="seccionActiva === 'solicitudes'" class="content">
+      <div class="section-header">
+        <div><h1>📋 Solicitudes de adopción</h1><p class="subtitle">Revisa y gestiona las peticiones</p></div>
+        <div class="header-badges">
+          <span class="badge-count pendiente">3 pendientes</span>
+          <span class="badge-count aprobada">1 aprobada</span>
+          <span class="badge-count rechazada">0 rechazadas</span>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active">Todas (4)</button>
+        <button class="tab">⏳ Pendientes (3)</button>
+        <button class="tab">✅ Aprobadas (1)</button>
+        <button class="tab">❌ Rechazadas (0)</button>
+      </div>
       <div class="panel">
-        <h2>Solicitudes de adopción</h2>
-        <p class="hint">Aquí se integrará el componente <code>SolicitudComponent</code>.</p>
+        <table class="table">
+          <thead><tr><th>#</th><th>Usuario</th><th>Mascota</th><th>Fecha</th><th>Comentarios</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="sol-id">#001</span></td>
+              <td><div class="user-mini"><div class="mini-avatar">JP</div><div><strong>Juan Pérez</strong><small>juan&#64;mail.com</small></div></div></td>
+              <td><span class="mascota-chip">🐶 Max</span></td>
+              <td>15/04/2024</td>
+              <td class="comentario">Tengo jardín propio.</td>
+              <td><span class="estado estado-disponible">pendiente</span></td>
+              <td class="acciones"><button class="btn-approve">✅ Aprobar</button><button class="btn-reject">❌ Rechazar</button></td>
+            </tr>
+            <tr>
+              <td><span class="sol-id">#002</span></td>
+              <td><div class="user-mini"><div class="mini-avatar">ML</div><div><strong>María López</strong><small>maria&#64;mail.com</small></div></div></td>
+              <td><span class="mascota-chip">🐱 Luna</span></td>
+              <td>18/04/2024</td>
+              <td class="comentario">Piso tranquilo.</td>
+              <td><span class="estado estado-en_proceso">pendiente</span></td>
+              <td class="acciones"><button class="btn-approve">✅ Aprobar</button><button class="btn-reject">❌ Rechazar</button></td>
+            </tr>
+            <tr>
+              <td><span class="sol-id">#003</span></td>
+              <td><div class="user-mini"><div class="mini-avatar">CR</div><div><strong>Carlos Ruiz</strong><small>carlos&#64;mail.com</small></div></div></td>
+              <td><span class="mascota-chip">🐶 Bruno</span></td>
+              <td>20/04/2024</td>
+              <td class="comentario">Casa con jardín.</td>
+              <td><span class="estado estado-adoptado">aprobada</span></td>
+              <td class="acciones"><button class="btn-icon danger">🗑️</button></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- ═════════════ Sección Veterinario ═════════════ -->
+    <!-- ══════════ VETERINARIO ══════════ -->
     <section *ngIf="seccionActiva === 'veterinario'" class="content">
       <div *ngIf="mensaje" class="toast">{{ mensaje }}</div>
-
-      <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab" [class.active]="tabVet === 'consultas'" (click)="tabVet = 'consultas'">
-          🩺 Historial de consultas
-        </button>
-        <button class="tab" [class.active]="tabVet === 'veterinarios'" (click)="tabVet = 'veterinarios'">
-          👨‍⚕️ Veterinarios
-        </button>
+      <div class="section-header">
+        <div><h1>🩺 Módulo Veterinario</h1><p class="subtitle">Consultas y registro de profesionales</p></div>
       </div>
-
+      <div class="tabs">
+        <button class="tab" [class.active]="tabVet === 'consultas'" (click)="tabVet = 'consultas'">🩺 Historial de consultas</button>
+        <button class="tab" [class.active]="tabVet === 'veterinarios'" (click)="tabVet = 'veterinarios'">👨‍⚕️ Veterinarios</button>
+      </div>
       <div *ngIf="cargandoVet" class="loading">Cargando...</div>
-
-      <!-- ── Tab: Consultas ── -->
       <div *ngIf="!cargandoVet && tabVet === 'consultas'" class="panel">
         <div class="panel-header">
           <h2>Consultas veterinarias</h2>
           <button class="btn-primary" (click)="abrirFormConsulta()">+ Nueva consulta</button>
         </div>
-
-        <div *ngIf="consultas.length === 0" class="empty">
-          No hay consultas registradas todavía.
-        </div>
-
+        <div *ngIf="consultas.length === 0" class="empty">No hay consultas registradas.</div>
         <table *ngIf="consultas.length > 0" class="table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Mascota</th>
-              <th>Veterinario</th>
-              <th>Motivo</th>
-              <th>Diagnóstico</th>
-              <th>Tratamiento</th>
-              <th *ngIf="esAdmin"></th>
-            </tr>
-          </thead>
+          <thead><tr><th>Fecha</th><th>Mascota</th><th>Veterinario</th><th>Motivo</th><th>Diagnóstico</th><th>Tratamiento</th><th *ngIf="esAdmin"></th></tr></thead>
           <tbody>
             <tr *ngFor="let c of consultas">
               <td>{{ c.fecha | date:'dd/MM/yy HH:mm' }}</td>
               <td><strong>{{ c.mascota_nombre }}</strong></td>
-              <td>
-                {{ c.veterinario_nombre || '—' }}
-                <small *ngIf="c.especialidad">({{ c.especialidad }})</small>
-              </td>
+              <td>{{ c.veterinario_nombre || '—' }} <small *ngIf="c.especialidad">({{ c.especialidad }})</small></td>
               <td>{{ c.motivo }}</td>
               <td>{{ c.diagnostico || '—' }}</td>
               <td>{{ c.tratamiento || '—' }}</td>
-              <td *ngIf="esAdmin">
-                <button class="btn-danger-sm" (click)="eliminarConsulta(c.id)">Eliminar</button>
-              </td>
+              <td *ngIf="esAdmin"><button class="btn-danger-sm" (click)="eliminarConsulta(c.id)">Eliminar</button></td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- ── Tab: Veterinarios ── -->
       <div *ngIf="!cargandoVet && tabVet === 'veterinarios'" class="panel">
         <div class="panel-header">
           <h2>Lista de veterinarios</h2>
           <button class="btn-primary" (click)="abrirFormVet()" *ngIf="esAdmin">+ Nuevo veterinario</button>
         </div>
-
         <div *ngIf="veterinarios.length === 0" class="empty">No hay veterinarios registrados.</div>
-
         <div *ngIf="veterinarios.length > 0" class="vet-grid">
           <div *ngFor="let v of veterinarios" class="vet-card" [class.inactivo]="!v.activo">
             <div class="vet-avatar">{{ v.nombre[0] }}</div>
@@ -230,61 +671,389 @@
               <small *ngIf="v.email">✉️ {{ v.email }}</small>
             </div>
             <div class="vet-actions" *ngIf="esAdmin">
-              <span class="estado" [ngClass]="v.activo ? 'estado-disponible' : 'estado-adoptado'">
-                {{ v.activo ? 'Activo' : 'Inactivo' }}
-              </span>
-              <button class="link-btn" (click)="toggleVet(v)">
-                {{ v.activo ? 'Desactivar' : 'Activar' }}
-              </button>
+              <span class="estado" [ngClass]="v.activo ? 'estado-disponible' : 'estado-adoptado'">{{ v.activo ? 'Activo' : 'Inactivo' }}</span>
+              <button class="link-btn" (click)="toggleVet(v)">{{ v.activo ? 'Desactivar' : 'Activar' }}</button>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ── Modal nueva consulta ── -->
+    <!-- ══════════ HISTORIAL MASCOTA ══════════ -->
+    <section *ngIf="seccionActiva === 'historial_mascota'" class="content hist-mascota">
+      <a class="hm-back-link" (click)="irA('veterinario')">← Volver a Consultas</a>
+
+      <div class="view-header">
+        <div class="view-title">
+          <span class="view-icon">🩺</span>
+          <div>
+            <h1>Historial Médico de Mascota</h1>
+            <small class="view-sub">v_historial_mascota — Módulo Veterinario / Admin</small>
+          </div>
+        </div>
+        <span class="endpoint-badge" style="color:#22d3ee">GET /v_historial_mascota?mascota_id=eq.&#123;uuid&#125;</span>
+      </div>
+
+      <!-- Cabecera mascota -->
+      <div class="hm-mascota-card">
+        <div class="hm-mascota-photo">
+          🐶
+          <span class="hm-portada-badge">📸 Portada</span>
+        </div>
+        <div class="hm-mascota-info">
+          <div class="hm-nombre">Max</div>
+          <div class="hm-especie-raza">🐶 Perro — Labrador Retriever</div>
+          <div class="hm-mascota-tags">
+            <span class="hm-tag tag-green">✅ Disponible</span>
+            <span class="hm-tag tag-blue">♂ Macho</span>
+            <span class="hm-tag tag-cyan">✅ Esterilizado</span>
+            <span class="hm-tag tag-gray">🏷️ Perro</span>
+          </div>
+          <div class="hm-mascota-meta">
+            <div class="hm-meta-item"><div class="lbl">Edad</div><div class="val">1 año 4 meses</div></div>
+            <div class="hm-meta-item"><div class="lbl">Peso actual</div><div class="val">28.5 kg</div></div>
+            <div class="hm-meta-item"><div class="lbl">Fecha de nacimiento</div><div class="val small">15 Dic 2024</div></div>
+            <div class="hm-meta-item"><div class="lbl">ID Mascota</div><div class="val small mono">a3f2...91bc</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="hm-tabs-bar">
+        <button class="hm-tab-btn" [class.active]="tabHist === 'resumen'" (click)="tabHist = 'resumen'">📊 Resumen</button>
+        <button class="hm-tab-btn" [class.active]="tabHist === 'consultas'" (click)="tabHist = 'consultas'">🩺 Consultas médicas</button>
+        <button class="hm-tab-btn" [class.active]="tabHist === 'tratamientos'" (click)="tabHist = 'tratamientos'">💊 Tratamientos activos</button>
+        <button class="hm-tab-btn" [class.active]="tabHist === 'vacunacion'" (click)="tabHist = 'vacunacion'">💉 Vacunación</button>
+        <button class="hm-tab-btn" [class.active]="tabHist === 'galeria'" (click)="tabHist = 'galeria'">📸 Galería</button>
+      </div>
+
+      <!-- TAB: RESUMEN -->
+      <div *ngIf="tabHist === 'resumen'">
+        <div class="hm-kpi-grid">
+          <div class="hm-kpi-card">
+            <div class="hm-kpi-icon">🩺</div>
+            <div class="hm-kpi-label">Total consultas</div>
+            <div class="hm-kpi-value">8</div>
+            <div class="hm-kpi-sub">Historial completo</div>
+          </div>
+          <div class="hm-kpi-card">
+            <div class="hm-kpi-icon">📅</div>
+            <div class="hm-kpi-label">Última visita</div>
+            <div class="hm-kpi-value sm">12 Abr 2025</div>
+            <div class="hm-kpi-sub">Hace 16 días</div>
+          </div>
+          <div class="hm-kpi-card">
+            <div class="hm-kpi-icon">💉</div>
+            <div class="hm-kpi-label">Próxima vacuna</div>
+            <div class="hm-kpi-value sm warn">15 May 2025</div>
+            <div class="hm-kpi-sub warn">⚠ Vence en 17 días</div>
+          </div>
+          <div class="hm-kpi-card">
+            <div class="hm-kpi-icon">💊</div>
+            <div class="hm-kpi-label">Tratamientos activos</div>
+            <div class="hm-kpi-value">2</div>
+            <div class="hm-kpi-sub">En curso</div>
+          </div>
+        </div>
+
+        <div class="hm-grid-2">
+          <div class="hm-card">
+            <div class="hm-card-title">🕐 Últimos eventos</div>
+            <div class="hm-timeline">
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-consulta">🩺</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Consulta de control</div>
+                  <div class="t-date">12 Abr 2025 · Dr. Ramírez</div>
+                  <div class="t-desc">Revisión post-esterilización. Peso: 28.5 kg. Sin complicaciones.</div>
+                </div>
+              </div>
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-tratamiento">💊</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Amoxicilina 500mg iniciada</div>
+                  <div class="t-date">12 Abr 2025</div>
+                  <div class="t-desc">Antibiótico preventivo. 10 días de duración.</div>
+                </div>
+              </div>
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-vacuna">💉</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Vacuna Parvovirus aplicada</div>
+                  <div class="t-date">3 Mar 2025 · Dr. Ramírez</div>
+                  <div class="t-desc">Lote: PAR-2025-C. Próxima dosis: 15 May 2025.</div>
+                </div>
+              </div>
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-consulta">🩺</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Consulta — Malestar digestivo</div>
+                  <div class="t-date">20 Feb 2025 · Dr. Pérez</div>
+                  <div class="t-desc">Diarrea leve. Dieta blanda indicada por 5 días.</div>
+                </div>
+              </div>
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-vacuna">💉</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Vacuna Triple canina aplicada</div>
+                  <div class="t-date">10 Ene 2025 · Dr. Ramírez</div>
+                  <div class="t-desc">Lote: TC-2025-A.</div>
+                </div>
+              </div>
+              <div class="hm-timeline-item">
+                <div class="hm-timeline-dot dot-consulta">🩺</div>
+                <div class="hm-timeline-content">
+                  <div class="t-title">Primera consulta de ingreso</div>
+                  <div class="t-date">15 Ene 2025 · Dr. Pérez</div>
+                  <div class="t-desc">Chequeo general al ingreso. Peso inicial: 21 kg.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hm-card">
+            <div class="hm-card-title">📋 Datos clínicos actuales</div>
+            <div class="hm-clinical">
+              <div class="hm-clinical-row"><span>Último peso registrado</span><strong>28.5 kg</strong></div>
+              <div class="hm-clinical-row"><span>Última temperatura</span><strong>38.4 °C</strong></div>
+              <div class="hm-clinical-row"><span>Esterilizado</span><span class="hm-tag tag-cyan">✅ Sí</span></div>
+              <div class="hm-clinical-row"><span>Estado actual</span><span class="hm-tag tag-green">Disponible</span></div>
+              <div class="hm-clinical-row"><span>Vacunas aplicadas</span><strong>5</strong></div>
+              <div class="hm-clinical-row"><span>Alergias registradas</span><span class="muted">Ninguna</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: CONSULTAS -->
+      <div *ngIf="tabHist === 'consultas'">
+        <div class="hm-card no-pad">
+          <div class="hm-table-header">
+            <div class="hm-card-title no-mb">🩺 Consultas médicas
+              <span class="hm-card-sub">8 registros — ordenadas cronológicamente</span>
+            </div>
+          </div>
+          <table class="hm-data-table">
+            <thead>
+              <tr>
+                <th>Fecha</th><th>Veterinario</th><th>Motivo</th>
+                <th>Diagnóstico</th><th>Peso</th><th>Temp.</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let row of [
+                {id:'r1', fecha:'12 Abr 2025', vet:'Dr. Ramírez', motivo:'Control post-cirugía', dx:'Recuperación favorable', peso:'28.5 kg', temp:'38.4 °C', obs:'Cicatriz en buen estado. No presenta inflamación ni signos de infección. Se indica continuar con antibiótico preventivo por 10 días más.', tx:['💊 Amoxicilina 500mg — 10 días','🩹 Curación diaria']},
+                {id:'r2', fecha:'3 Mar 2025', vet:'Dr. Ramírez', motivo:'Vacunación programada', dx:'Sin observaciones', peso:'27.1 kg', temp:'38.2 °C', obs:'Mascota en buen estado general. Se aplica vacuna Parvovirus según calendario. Se programa próxima dosis para 15 May 2025.', tx:['💉 Vacuna Parvovirus — Lote PAR-2025-C']},
+                {id:'r3', fecha:'20 Feb 2025', vet:'Dr. Pérez', motivo:'Malestar digestivo', dx:'Gastroenteritis leve', peso:'26.8 kg', temp:'39.1 °C', obs:'Diarrea leve sin sangre. Temperatura levemente elevada. Se prescribe dieta blanda por 5 días y probióticos.', tx:['🌿 Dieta blanda — 5 días','💊 Probióticos — 7 días']},
+                {id:'r4', fecha:'10 Ene 2025', vet:'Dr. Ramírez', motivo:'Vacunación triple', dx:'Sin observaciones', peso:'24.3 kg', temp:'38.1 °C', obs:'Estado general excelente. Se aplican vacunas de la serie inicial: Triple canina.', tx:['💉 Triple canina — Lote TC-2025-A']},
+                {id:'r5', fecha:'15 Dic 2024', vet:'Dr. Pérez', motivo:'Ingreso al refugio', dx:'Revisión general', peso:'21.0 kg', temp:'38.5 °C', obs:'Primera consulta al ingreso. Mascota en buen estado, algo desnutrida. Sin heridas externas.', tx:['🦷 Desparasitación interna','🦟 Desparasitación externa']}
+              ]">
+                <tr class="expandable" (click)="toggleFila(row.id)">
+                  <td><strong>{{ row.fecha }}</strong></td>
+                  <td>{{ row.vet }}</td>
+                  <td>{{ row.motivo }}</td>
+                  <td>{{ row.dx }}</td>
+                  <td>{{ row.peso }}</td>
+                  <td>{{ row.temp }}</td>
+                  <td class="hm-arrow">{{ filasExpandidas[row.id] ? '▼' : '▶' }}</td>
+                </tr>
+                <tr *ngIf="filasExpandidas[row.id]" class="hm-expand-row">
+                  <td colspan="7">
+                    <div class="hm-expand-content">
+                      <div class="hm-expand-label">Observaciones</div>
+                      <div class="hm-expand-text">{{ row.obs }}</div>
+                      <div class="hm-expand-label">Tratamientos derivados</div>
+                      <div>
+                        <span class="hm-tx-chip" *ngFor="let t of row.tx">{{ t }}</span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: TRATAMIENTOS -->
+      <div *ngIf="tabHist === 'tratamientos'">
+        <div class="hm-section-header">
+          <div>
+            <div class="hm-section-title">💊 Tratamientos activos</div>
+            <div class="hm-section-sub">2 tratamientos en curso</div>
+          </div>
+          <span class="hm-tag tag-yellow">⚠ 2 activos</span>
+        </div>
+
+        <div class="hm-trat-grid">
+          <div class="hm-trat-card medicamento">
+            <div class="hm-trat-header">
+              <div class="hm-trat-nombre">Amoxicilina</div>
+              <span class="hm-trat-tipo tipo-medicamento">Medicamento</span>
+            </div>
+            <div class="hm-trat-meta">
+              <div><div class="lbl">Dosis</div><div class="val">500 mg / 12h</div></div>
+              <div><div class="lbl">Duración</div><div class="val">10 días</div></div>
+              <div><div class="lbl">Inicio</div><div class="val">12 Abr 2025</div></div>
+              <div><div class="lbl">Fin</div><div class="val">22 Abr 2025</div></div>
+            </div>
+            <div class="hm-trat-instrucciones">
+              Administrar con comida para evitar irritación gástrica. Completar el tratamiento aunque el animal mejore antes.
+            </div>
+            <div class="hm-progress-wrap">
+              <div class="hm-progress-label"><span>Progreso del tratamiento</span><span>6 de 10 días</span></div>
+              <div class="hm-progress-bar"><div class="hm-progress-fill" style="width:60%;background:#3b82f6"></div></div>
+            </div>
+          </div>
+
+          <div class="hm-trat-card procedimiento">
+            <div class="hm-trat-header">
+              <div class="hm-trat-nombre">Curación de herida</div>
+              <span class="hm-trat-tipo tipo-procedimiento">Procedimiento</span>
+            </div>
+            <div class="hm-trat-meta">
+              <div><div class="lbl">Frecuencia</div><div class="val">1 vez / día</div></div>
+              <div><div class="lbl">Duración</div><div class="val">7 días</div></div>
+              <div><div class="lbl">Inicio</div><div class="val">12 Abr 2025</div></div>
+              <div><div class="lbl">Fin</div><div class="val">19 Abr 2025</div></div>
+            </div>
+            <div class="hm-trat-instrucciones">
+              Limpiar con solución fisiológica. Aplicar ungüento antibacterial. Cubrir con gasa estéril. Evitar que la mascota lama la zona.
+            </div>
+            <div class="hm-progress-wrap">
+              <div class="hm-progress-label"><span>Progreso del tratamiento</span><span>6 de 7 días</span></div>
+              <div class="hm-progress-bar"><div class="hm-progress-fill" style="width:85%;background:#f97316"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hm-section-header" style="margin-top:24px">
+          <div class="hm-section-title">📂 Tratamientos completados</div>
+        </div>
+        <div class="hm-card no-pad">
+          <table class="hm-data-table">
+            <thead><tr><th>Tipo</th><th>Nombre</th><th>Dosis / Frecuencia</th><th>Duración</th><th>Consulta origen</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td><span class="hm-trat-tipo tipo-medicamento">Medicamento</span></td><td>Probióticos intestinales</td><td>1 sobre / día</td><td>7 días</td><td>20 Feb 2025</td><td><span class="hm-tag tag-green">✅ Completado</span></td></tr>
+              <tr><td><span class="hm-trat-tipo tipo-procedimiento">Procedimiento</span></td><td>Desparasitación externa</td><td>Aplicación única</td><td>1 aplicación</td><td>15 Dic 2024</td><td><span class="hm-tag tag-green">✅ Completado</span></td></tr>
+              <tr><td><span class="hm-trat-tipo tipo-procedimiento">Procedimiento</span></td><td>Desparasitación interna</td><td>Tableta / única</td><td>1 aplicación</td><td>15 Dic 2024</td><td><span class="hm-tag tag-green">✅ Completado</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB: VACUNACIÓN -->
+      <div *ngIf="tabHist === 'vacunacion'">
+        <div class="hm-card no-pad">
+          <div class="hm-table-header between">
+            <div class="hm-card-title no-mb">💉 Historial de vacunación
+              <span class="hm-card-sub">5 vacunas aplicadas</span>
+            </div>
+            <span class="hm-vence-badge vence-pronto">⚠ 1 vence pronto</span>
+          </div>
+          <table class="hm-data-table">
+            <thead>
+              <tr>
+                <th>Vacuna</th><th>Descripción</th><th>Fecha aplicación</th>
+                <th>Lote</th><th>Veterinario</th><th>Próxima dosis</th><th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Parvovirus</strong></td>
+                <td class="muted">Protección contra parvovirus canino</td>
+                <td>3 Mar 2025</td>
+                <td><code class="hm-lote">PAR-2025-C</code></td>
+                <td>Dr. Ramírez</td>
+                <td><strong style="color:#dc2626">15 May 2025</strong></td>
+                <td><span class="hm-vence-badge vence-pronto">⚠ Vence pronto</span></td>
+              </tr>
+              <tr>
+                <td><strong>Triple canina</strong></td>
+                <td class="muted">Moquillo, hepatitis, parvovirus</td>
+                <td>10 Ene 2025</td>
+                <td><code class="hm-lote">TC-2025-A</code></td>
+                <td>Dr. Ramírez</td>
+                <td>10 Ene 2026</td>
+                <td><span class="hm-vence-badge vence-ok">✅ Al día</span></td>
+              </tr>
+              <tr>
+                <td><strong>Rabia</strong></td>
+                <td class="muted">Vacuna antirrábica anual</td>
+                <td>10 Ene 2025</td>
+                <td><code class="hm-lote">RAB-2025-B</code></td>
+                <td>Dr. Ramírez</td>
+                <td>10 Ene 2026</td>
+                <td><span class="hm-vence-badge vence-ok">✅ Al día</span></td>
+              </tr>
+              <tr>
+                <td><strong>Leptospirosis</strong></td>
+                <td class="muted">Prevención de leptospirosis</td>
+                <td>15 Dic 2024</td>
+                <td><code class="hm-lote">LEP-2024-F</code></td>
+                <td>Dr. Pérez</td>
+                <td>15 Dic 2025</td>
+                <td><span class="hm-vence-badge vence-ok">✅ Al día</span></td>
+              </tr>
+              <tr>
+                <td><strong>Bordetella</strong></td>
+                <td class="muted">Tos de las perreras</td>
+                <td>15 Dic 2024</td>
+                <td><code class="hm-lote">BOR-2024-A</code></td>
+                <td>Dr. Pérez</td>
+                <td class="muted">— Dosis única</td>
+                <td><span class="hm-vence-badge vence-na">— N/A</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="hm-alert">
+          <span class="hm-alert-icon">⚠️</span>
+          <div>
+            <div class="hm-alert-title">Alerta de vacunación próxima</div>
+            <div class="hm-alert-text">La vacuna <strong>Parvovirus</strong> de Max vence el <strong>15 de mayo de 2025</strong> (en 17 días). Programe la cita a la brevedad.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: GALERÍA -->
+      <div *ngIf="tabHist === 'galeria'">
+        <div class="hm-section-header">
+          <div>
+            <div class="hm-section-title">📸 Galería de fotos</div>
+            <div class="hm-section-sub">6 fotos — ordenadas por prioridad · mascotas_fotos</div>
+          </div>
+        </div>
+        <div class="hm-gallery-grid">
+          <div class="hm-gallery-item portada">🐶
+            <span class="hm-portada-label">📸 Portada</span>
+            <span class="hm-orden-label">#1</span>
+          </div>
+          <div class="hm-gallery-item">🐾<span class="hm-orden-label">#2</span></div>
+          <div class="hm-gallery-item">🦴<span class="hm-orden-label">#3</span></div>
+          <div class="hm-gallery-item">🐕<span class="hm-orden-label">#4</span></div>
+          <div class="hm-gallery-item">😴<span class="hm-orden-label">#5</span></div>
+          <div class="hm-gallery-item">🐶<span class="hm-orden-label">#6</span></div>
+        </div>
+        <div class="hm-gallery-note">
+          Las fotos reales se cargan desde <code>mascotas_fotos.url</code> via PostgREST · Las miniaturas se muestran con <code>&lt;img&gt;</code>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modales -->
     <div class="modal-overlay" *ngIf="mostrarFormConsulta" (click)="mostrarFormConsulta = false">
       <div class="modal" (click)="$event.stopPropagation()">
         <h3>Nueva consulta veterinaria</h3>
         <div class="form">
-          <label>
-            Mascota *
-            <select [(ngModel)]="nuevaConsulta.mascota_id" name="mascota">
-              <option [ngValue]="0">-- Selecciona --</option>
-              <option *ngFor="let m of mascotas" [ngValue]="m.id">
-                {{ m.nombre }} ({{ m.raza_nombre }})
-              </option>
-            </select>
-          </label>
-          <label>
-            Veterinario
-            <select [(ngModel)]="nuevaConsulta.veterinario_id" name="vet">
-              <option [ngValue]="undefined">-- Sin asignar --</option>
-              <option *ngFor="let v of veterinarios" [ngValue]="v.id">
-                {{ v.nombre }}
-              </option>
-            </select>
-          </label>
-          <label>
-            Fecha y hora
-            <input type="datetime-local" [(ngModel)]="nuevaConsulta.fecha" name="fecha">
-          </label>
-          <label>
-            Motivo *
-            <input type="text" [(ngModel)]="nuevaConsulta.motivo" name="motivo" placeholder="Ej: chequeo general">
-          </label>
-          <label>
-            Diagnóstico
-            <input type="text" [(ngModel)]="nuevaConsulta.diagnostico" name="dx">
-          </label>
-          <label>
-            Tratamiento
-            <input type="text" [(ngModel)]="nuevaConsulta.tratamiento" name="tx">
-          </label>
-          <label>
-            Notas
-            <textarea rows="3" [(ngModel)]="nuevaConsulta.notas" name="notas"></textarea>
-          </label>
+          <label>Mascota *<select [(ngModel)]="nuevaConsulta.mascota_id" name="mascota"><option [ngValue]="0">-- Selecciona --</option><option *ngFor="let m of mascotas" [ngValue]="m.id">{{ m.nombre }} ({{ m.raza_nombre }})</option></select></label>
+          <label>Veterinario<select [(ngModel)]="nuevaConsulta.veterinario_id" name="vet"><option [ngValue]="undefined">-- Sin asignar --</option><option *ngFor="let v of veterinarios" [ngValue]="v.id">{{ v.nombre }}</option></select></label>
+          <label>Fecha y hora<input type="datetime-local" [(ngModel)]="nuevaConsulta.fecha" name="fecha"></label>
+          <label>Motivo *<input type="text" [(ngModel)]="nuevaConsulta.motivo" name="motivo"></label>
+          <label>Diagnóstico<input type="text" [(ngModel)]="nuevaConsulta.diagnostico" name="dx"></label>
+          <label>Tratamiento<input type="text" [(ngModel)]="nuevaConsulta.tratamiento" name="tx"></label>
+          <label>Notas<textarea rows="3" [(ngModel)]="nuevaConsulta.notas" name="notas"></textarea></label>
         </div>
         <div class="modal-actions">
           <button class="btn-secondary" (click)="mostrarFormConsulta = false">Cancelar</button>
@@ -293,27 +1062,14 @@
       </div>
     </div>
 
-    <!-- ── Modal nuevo veterinario ── -->
     <div class="modal-overlay" *ngIf="mostrarFormVet" (click)="mostrarFormVet = false">
       <div class="modal" (click)="$event.stopPropagation()">
         <h3>Nuevo veterinario</h3>
         <div class="form">
-          <label>
-            Nombre *
-            <input type="text" [(ngModel)]="nuevoVet.nombre" name="vnombre">
-          </label>
-          <label>
-            Especialidad
-            <input type="text" [(ngModel)]="nuevoVet.especialidad" name="vesp">
-          </label>
-          <label>
-            Teléfono
-            <input type="text" [(ngModel)]="nuevoVet.telefono" name="vtel">
-          </label>
-          <label>
-            Email
-            <input type="email" [(ngModel)]="nuevoVet.email" name="vemail">
-          </label>
+          <label>Nombre *<input type="text" [(ngModel)]="nuevoVet.nombre" name="vnombre"></label>
+          <label>Especialidad<input type="text" [(ngModel)]="nuevoVet.especialidad" name="vesp"></label>
+          <label>Teléfono<input type="text" [(ngModel)]="nuevoVet.telefono" name="vtel"></label>
+          <label>Email<input type="email" [(ngModel)]="nuevoVet.email" name="vemail"></label>
         </div>
         <div class="modal-actions">
           <button class="btn-secondary" (click)="mostrarFormVet = false">Cancelar</button>

@@ -1,0 +1,111 @@
+<div class="page-hero">
+  <h1>📅 Agenda tu Cita Veterinaria</h1>
+  <p>Nuestros veterinarios especializados están listos para cuidar la salud de tu mascota</p>
+</div>
+
+<div class="cita-container">
+  <a class="back-btn" routerLink="/">← Volver al Inicio</a>
+
+  <!-- Confirmación -->
+  <div *ngIf="confirmado" class="confirm-card">
+    <div class="confirm-icon">✅</div>
+    <h3>¡Cita Reservada!</h3>
+    <p>Tu cita ha sido agendada exitosamente. Te contactaremos para confirmar los detalles.</p>
+    <div class="confirm-details">
+      <div class="confirm-row"><span class="lbl">Veterinario</span><span class="val">{{ resumen?.vet }}</span></div>
+      <div class="confirm-row"><span class="lbl">Dueño</span><span class="val">{{ resumen?.dueno }}</span></div>
+      <div class="confirm-row"><span class="lbl">Mascota</span><span class="val">{{ resumen?.mascota }}</span></div>
+      <div class="confirm-row"><span class="lbl">Fecha</span><span class="val">{{ resumen?.fecha }}</span></div>
+      <div class="confirm-row"><span class="lbl">Hora</span><span class="val">{{ resumen?.hora }}</span></div>
+      <div class="confirm-row"><span class="lbl">Correo</span><span class="val">{{ resumen?.email }}</span></div>
+    </div>
+    <button class="btn-primary full" (click)="reset()">Agendar otra cita</button>
+  </div>
+
+  <!-- Formulario -->
+  <div *ngIf="!confirmado">
+    <!-- STEP 1 -->
+    <div class="step-label">
+      <div class="step-num" [class.done]="vetSeleccionado">{{ vetSeleccionado ? '✓' : '1' }}</div>
+      Selecciona un Veterinario
+    </div>
+
+    <div *ngIf="veterinarios.length === 0" class="empty-state">Cargando veterinarios...</div>
+
+    <div *ngIf="veterinarios.length > 0" class="vets-grid">
+      <div *ngFor="let v of veterinarios"
+           class="vet-card"
+           [class.selected]="vetSeleccionado?.id === v.id"
+           (click)="seleccionarVet(v)">
+        <div class="vet-avatar">{{ emojiEspecialidad(v.especialidad) }}</div>
+        <div class="vet-nombre">{{ v.nombre }}</div>
+        <div class="vet-esp">{{ v.especialidad || 'Medicina General' }}</div>
+        <span class="vet-esp-badge" [ngClass]="cssEspecialidad(v.especialidad)">
+          {{ v.especialidad || 'Medicina General' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-label">
+      <div class="step-num">2</div>
+      Completa tus Datos
+    </div>
+
+    <div class="cita-form-card">
+      <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
+
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Nombre del Dueño</label>
+          <input type="text" [(ngModel)]="form.nombre" placeholder="Tu nombre completo">
+        </div>
+        <div class="form-group">
+          <label>Nombre de la Mascota</label>
+          <input type="text" [(ngModel)]="form.mascota" placeholder="Nombre de tu mascota">
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" [(ngModel)]="form.email" placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Teléfono</label>
+          <input type="tel" [(ngModel)]="form.telefono" placeholder="614-100-2233">
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>📅 Fecha</label>
+          <input type="date" [(ngModel)]="form.fecha">
+        </div>
+        <div class="form-group">
+          <label>🕐 Hora</label>
+          <select [(ngModel)]="form.hora">
+            <option value="">Selecciona una hora</option>
+            <option *ngFor="let h of horas" [value]="h">{{ h }}</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tipo de Mascota</label>
+        <select [(ngModel)]="form.tipo">
+          <option value="">Selecciona</option>
+          <option>🐶 Perro</option>
+          <option>🐱 Gato</option>
+          <option>🐰 Conejo</option>
+          <option>Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Motivo de Consulta</label>
+        <textarea [(ngModel)]="form.motivo" rows="4" placeholder="Describe el motivo de tu visita..."></textarea>
+      </div>
+
+      <button class="btn-reservar" (click)="reservar()" [disabled]="enviando">
+        {{ enviando ? 'Reservando...' : '📅 Confirmar Reserva' }}
+      </button>
+    </div>
+  </div>
+</div>

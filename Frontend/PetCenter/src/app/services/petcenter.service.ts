@@ -131,4 +131,19 @@ export class PetcenterService {
   eliminarConsulta(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/consultas_veterinarias?id=eq.${id}`);
   }
+
+  // ─── CITAS PÚBLICAS ──────────────────────────────────────
+
+  getCitas(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/citas?order=fecha.asc`);
+  }
+
+  crearCita(cita: any): Observable<any> {
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.post(`${this.apiUrl}/citas`, cita, { headers });
+  }
+
+  actualizarCita(id: number, datos: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/citas?id=eq.${id}`, datos);
+  }
 }
