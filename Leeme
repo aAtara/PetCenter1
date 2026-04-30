@@ -1,77 +1,244 @@
 # PetCenter 🐾
 
-Aplicación fullstack de adopción de mascotas.
+Aplicación fullstack de un refugio de adopción de mascotas con portal público para clientes y dashboard administrativo para staff.
 
-**Stack:** Angular + PostgREST + PostgreSQL + Docker
-
----
-
-## Estructura del proyecto
-
-```
-PetCenter1/
-├── docker-compose.yml      ← levanta DB + API
-├── init.sql                ← crea las tablas
-├── .gitignore
-└── Frontend/
-    └── PetCenter/          ← proyecto Angular
-        ├── src/app/
-        │   ├── components/
-        │   │   ├── Mascotas/
-        │   │   ├── Adopciones/
-        │   │   └── login/
-        │   ├── models/
-        │   └── services/
-        └── proxy.conf.json
-```
+**Stack:** Angular 21 (TypeScript) + PostgREST + PostgreSQL + Docker
 
 ---
 
-## Cómo correr el proyecto
+## ⚙️ Requisitos previos
 
-### 1. Levantar Docker (backend + base de datos)
+Antes de empezar, necesitan tener instalado:
 
-Desde la raíz del proyecto (donde está `docker-compose.yml`):
+| Herramienta | Para qué sirve | Link de descarga |
+|-------------|----------------|------------------|
+| **Docker Desktop** | Levanta la BD y la API | https://www.docker.com/products/docker-desktop/ |
+| **Node.js (LTS)** | Corre el frontend Angular | https://nodejs.org/ |
+| **Git** | Clonar el repo | https://git-scm.com/downloads |
+| **Angular CLI** | Comando `ng serve` | Se instala con: `npm install -g @angular/cli` |
+
+⚠️ **Importante:** Antes de empezar, abran Docker Desktop y esperen a que el ícono de la ballena esté en verde (estado "running").
+
+---
+
+## 🚀 Cómo correr el proyecto (paso a paso)
+
+### Paso 1 — Abrir una terminal
+
+En Windows tienen 3 opciones para abrir una terminal:
+
+- **PowerShell**: menú Inicio → escriben "PowerShell" → Enter
+- **Git Bash**: click derecho en cualquier carpeta → "Git Bash Here"
+- **Terminal de VS Code**: abren VS Code → menú **Terminal → New Terminal** (o `Ctrl + ñ`)
+
+### Paso 2 — Clonar el repositorio
+
+En la terminal, naveguen a donde quieran guardar el proyecto (ej: Desktop) y ejecuten:
 
 ```bash
-docker compose up
+cd Desktop
+git clone https://github.com/aAtara/PetCenter1.git
+cd PetCenter1
 ```
 
-Esto levanta:
-- PostgreSQL en `localhost:5432`
-- PostgREST (API) en `localhost:3000`
+### Paso 3 — Levantar la base de datos y la API
 
-Verifica que funciona: http://localhost:3000/mascotas
+Aún en la carpeta `PetCenter1`, ejecuten:
 
-### 2. Correr Angular (frontend)
+```bash
+docker compose up -d
+```
+
+Esto crea 2 contenedores Docker:
+- **petcenter_db** — PostgreSQL en el puerto 5433
+- **petcenter_api** — PostgREST en el puerto 3000
+
+Verificar que funcionan visitando: http://localhost:3000/mascotas
+
+Deberían ver una lista JSON con mascotas. ✅
+
+### Paso 4 — Instalar dependencias del frontend
 
 ```bash
 cd Frontend/PetCenter
 npm install
+```
+
+(la primera vez tarda 1-2 minutos)
+
+### Paso 5 — Correr el frontend
+
+```bash
 ng serve
 ```
 
-Angular corre en http://localhost:4200
+Esperen a ver el mensaje **"Application bundle generation complete"**.
 
-El `proxy.conf.json` ya está configurado para redirigir `/api/*` → `localhost:3000/*` automáticamente.
+### Paso 6 — Abrir en el navegador
 
----
+```
+http://localhost:4200/
+```
 
-## Endpoints disponibles (PostgREST)
-
-| Método | URL | Descripción |
-|--------|-----|-------------|
-| GET | `/api/mascotas` | Todas las mascotas |
-| GET | `/api/mascotas?estado=eq.disponible` | Solo disponibles |
-| GET | `/api/mascotas_detalle` | Mascotas con nombre de raza |
-| GET | `/api/solicitudes` | Todas las solicitudes |
-| POST | `/api/solicitudes` | Crear solicitud |
-| PATCH | `/api/solicitudes?id=eq.1` | Actualizar solicitud |
+¡Listo! Ya pueden navegar el portal público.
 
 ---
 
-## Notas importantes
+## 🔑 Credenciales para entrar al panel staff
 
-- La carpeta `.angular/` **NO** debe subirse a git (ya está en `.gitignore`)
-- El `proxy.conf.json` evita problemas de CORS en desarrollo
-- Para producción se necesita configurar CORS en PostgREST
+Vayan a `http://localhost:4200/login` y usen cualquiera de estas:
+
+| Rol | Email | Contraseña |
+|-----|-------|------------|
+| **Admin** | `admin@petcenter.com` | `admin123` |
+| **Trabajador** | `trabajador@petcenter.com` | `trab123` |
+| **Veterinario** | `veterinario@petcenter.com` | `vet123` |
+
+---
+
+## 🧪 Flujo completo para probar el sistema
+
+### Como cliente (sin login)
+1. Entren a `http://localhost:4200/`
+2. Click **"ADOPTA"** → ven el catálogo
+3. Click **"❤️ Quiero Adoptarlo"** en cualquier mascota
+4. Llenen el formulario y envíenlo
+5. Verán un modal "🐾 ¡Solicitud Enviada!"
+
+### Como trabajador (revisar solicitudes)
+1. Vayan a `/login` → entren con `trabajador@petcenter.com / trab123`
+2. Sidebar → 🟠 **Trabajador** → 📝 **Solicitudes**
+3. Verán la solicitud que enviaron como cliente
+4. Click **"✓ Aprobar"** → la mascota pasa a "en proceso"
+5. Aparece notificación simulada al cliente
+6. Click **"🎉 Completar"** cuando se entrega la mascota
+
+### Como admin (registrar mascotas)
+1. Login con `admin@petcenter.com / admin123`
+2. Sidebar → ⚙️ **Admin** → 🐶 **Mascotas**
+3. Click **"+ Nueva mascota"** → llenan el form → "Registrar mascota"
+4. Aparece al instante en el catálogo público
+
+---
+
+## 📂 Estructura del proyecto
+
+```
+PetCenter1/
+├── docker-compose.yml      ← levanta BD + API
+├── init.sql                ← script inicial de la BD
+├── proxy.conf.json         ← Angular → PostgREST proxy
+└── Frontend/PetCenter/
+    ├── public/
+    │   └── petcenter.png   ← logo
+    └── src/app/
+        ├── components/
+        │   ├── Portal/             ← portal público (cliente)
+        │   │   ├── portal-layout/  ← navbar + footer
+        │   │   └── views/
+        │   │       ├── home/       ← landing
+        │   │       ├── adopcion/   ← catálogo + form
+        │   │       └── cita/       ← cita veterinaria
+        │   ├── Dashboard/          ← panel staff
+        │   └── login/              ← login (solo staff)
+        ├── guards/
+        │   └── auth.guard.ts       ← protección de rutas
+        ├── models/
+        ├── services/
+        │   └── petcenter.service.ts ← llamadas a PostgREST
+        └── app.routes.ts
+```
+
+---
+
+## 🗄 ¿Dónde se guardan los datos?
+
+Los datos viven en un **volumen Docker** (no en la carpeta del proyecto). Para verlos:
+
+### Opción rápida — terminal
+```bash
+docker exec petcenter_db psql -U admin -d petcenter -c "SELECT * FROM mascotas;"
+docker exec petcenter_db psql -U admin -d petcenter -c "SELECT * FROM solicitudes;"
+```
+
+### Opción GUI — DBeaver (gratis)
+Descarga: https://dbeaver.io/
+
+Conexión PostgreSQL:
+- Host: `localhost`
+- Port: `5433`
+- Database: `petcenter`
+- Usuario: `admin`
+- Password: `secret`
+
+### Opción navegador — PostgREST
+- http://localhost:3000/mascotas
+- http://localhost:3000/solicitudes_detalle
+- http://localhost:3000/citas
+- http://localhost:3000/usuarios
+- http://localhost:3000/veterinarios
+
+---
+
+## 🛠 Comandos útiles
+
+```bash
+# Apagar todo (mantiene los datos)
+docker compose down
+
+# Apagar y BORRAR los datos (vuelve a init.sql)
+docker compose down -v
+
+# Levantar de nuevo
+docker compose up -d
+
+# Ver logs si algo falla
+docker compose logs -f
+
+# Backup de la BD
+docker exec petcenter_db pg_dump -U admin petcenter > backup.sql
+```
+
+---
+
+## ❓ Solución de problemas comunes
+
+| Problema | Solución |
+|----------|----------|
+| `docker compose` no reconocido | Abran Docker Desktop primero |
+| `ng` no reconocido | Instalen Angular CLI: `npm install -g @angular/cli` |
+| Error CORS o "no se puede conectar" | Verifiquen que Docker está corriendo: http://localhost:3000/mascotas |
+| El frontend no compila | Borren `node_modules` y corran `npm install` otra vez |
+| El login no funciona | Asegúrense que Docker está arriba (puerto 3000 activo) |
+| Las mascotas no aparecen | Refresquen con **Ctrl+Shift+R** (limpia caché) |
+
+---
+
+## 👥 Roles del sistema
+
+- **🔴 Admin** — control total: gestión de mascotas, solicitudes, veterinarios
+- **🟠 Trabajador** — gestiona solicitudes de adopción y adoptantes
+- **🔵 Veterinario** — agenda, consultas médicas, historial de mascotas
+
+---
+
+## 📝 Funcionalidades implementadas
+
+- ✅ Portal público para clientes (sin necesidad de cuenta)
+- ✅ Catálogo de mascotas con filtros
+- ✅ Formulario de adopción con datos del solicitante
+- ✅ Formulario de cita veterinaria
+- ✅ Login con 3 roles diferentes
+- ✅ Dashboard staff con sidebar agrupado por rol
+- ✅ CRUD de mascotas (crear, ver detalle, eliminar)
+- ✅ Flujo completo de aprobación: pendiente → aprobada → completada
+- ✅ Auto-rechazo de solicitudes duplicadas para la misma mascota
+- ✅ Botón de revertir adopción
+- ✅ Notificación simulada al cliente
+- ✅ Vista de historial médico por mascota con datos reales
+- ✅ Módulo veterinario con consultas y veterinarios
+- ✅ Protección de rutas con AuthGuard
+
+---
+
+Hecho con ❤️ en Chihuahua, Méx.
