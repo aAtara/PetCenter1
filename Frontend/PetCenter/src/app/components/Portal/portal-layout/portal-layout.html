@@ -1,14 +1,15 @@
 <div class="portal-root">
-  <!-- NAV -->
+  <!-- NAV (blanco, fixed top) -->
   <nav class="navbar">
-    <a class="navbar-brand" routerLink="/">
-      <div class="brand-icon">🐾</div>
-      <div class="brand-name">Pet<span>Center</span></div>
-    </a>
-    <div class="navbar-links">
-      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
-      <a class="nav-link" routerLink="/cita" routerLinkActive="active">Cita Veterinaria</a>
-      <a class="btn-nav-cta" routerLink="/adopcion">Ver Mascotas →</a>
+    <div class="navbar-inner">
+      <a class="navbar-brand" routerLink="/">
+        <img class="brand-img" src="petcenter.png" alt="PetCenter" />
+      </a>
+
+      <div class="navbar-links">
+        <a class="btn-pill primary" routerLink="/adopcion">ADOPTA</a>
+        <a class="btn-pill outline" routerLink="/cita">CITA VETERINARIA</a>
+      </div>
     </div>
   </nav>
 

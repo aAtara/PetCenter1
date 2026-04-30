@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
   nombre    TEXT NOT NULL,
   email     TEXT UNIQUE NOT NULL,
   password  TEXT NOT NULL,
-  rol       TEXT NOT NULL DEFAULT 'usuario' CHECK (rol IN ('usuario', 'admin')),
+  rol       TEXT NOT NULL DEFAULT 'trabajador'
+            CHECK (rol IN ('admin', 'trabajador', 'veterinario')),
   creado_en TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -32,13 +33,26 @@ CREATE TABLE IF NOT EXISTS mascotas (
 );
 
 -- Tabla: solicitudes
+-- Las solicitudes vienen de clientes anónimos (no requieren cuenta).
+-- Se guardan los datos del solicitante directamente en la tabla.
 CREATE TABLE IF NOT EXISTS solicitudes (
-  id                SERIAL PRIMARY KEY,
-  usuario_id        INT REFERENCES usuarios(id),
-  mascota_id        INT REFERENCES mascotas(id),
-  estado            TEXT NOT NULL DEFAULT 'pendiente' CHECK (estado IN ('pendiente', 'aprobada', 'rechazada')),
-  fecha_solicitud   TIMESTAMPTZ DEFAULT NOW(),
-  comentarios_admin TEXT
+  id                  SERIAL PRIMARY KEY,
+  mascota_id          INT NOT NULL REFERENCES mascotas(id),
+  -- Datos del cliente solicitante
+  nombre_solicitante  TEXT NOT NULL,
+  email_solicitante   TEXT NOT NULL,
+  telefono            TEXT,
+  ciudad              TEXT,
+  vivienda            TEXT,
+  mascotas_previas    TEXT,
+  -- Estado de la solicitud
+  estado              TEXT NOT NULL DEFAULT 'pendiente'
+                      CHECK (estado IN ('pendiente', 'aprobada', 'rechazada')),
+  fecha_solicitud     TIMESTAMPTZ DEFAULT NOW(),
+  comentarios_admin   TEXT,
+  -- Trabajador que la procesó (opcional)
+  procesada_por       INT REFERENCES usuarios(id),
+  fecha_decision      TIMESTAMPTZ
 );
 
 -- Tabla: veterinarios
@@ -100,8 +114,15 @@ INSERT INTO mascotas (nombre, edad_meses, genero, raza_id, estado, descripcion, 
   ('Bruno',  18, 'macho',  2, 'disponible', 'Excelente con niños',        '2024-04-01');
 
 INSERT INTO usuarios (nombre, email, password, rol) VALUES
-  ('Admin PetCenter', 'admin@petcenter.com', 'admin123', 'admin'),
-  ('Juan Pérez',      'juan@mail.com',       'juan123',  'usuario');
+  ('Admin PetCenter',     'admin@petcenter.com',       'admin123', 'admin'),
+  ('Laura Trabajadora',   'trabajador@petcenter.com',  'trab123',  'trabajador'),
+  ('Dr. Carlos Vet',      'veterinario@petcenter.com', 'vet123',   'veterinario');
+
+-- Solicitudes de adopción de ejemplo
+INSERT INTO solicitudes (mascota_id, nombre_solicitante, email_solicitante, telefono, ciudad, vivienda, mascotas_previas, estado) VALUES
+  (1, 'Ana García',    'ana@mail.com',     '614-100-2233', 'Chihuahua',         'Casa con jardín',  'Sí', 'pendiente'),
+  (2, 'Luis Torres',   'luis@mail.com',    '614-555-9910', 'Delicias',          'Casa sin jardín',  'No', 'pendiente'),
+  (3, 'Rosa Mendoza',  'rosa@mail.com',    '614-321-7744', 'Chihuahua',         'Casa con jardín',  'Sí', 'aprobada');
 
 INSERT INTO veterinarios (nombre, especialidad, telefono, email) VALUES
   ('Dra. María González', 'Medicina general',  '555-0101', 'maria@petcenter.com'),
@@ -128,6 +149,32 @@ CREATE OR REPLACE VIEW mascotas_detalle AS
     r.especie  AS raza_especie
   FROM mascotas m
   LEFT JOIN raza r ON m.raza_id = r.id;
+
+-- Vista de solicitudes con datos de la mascota (para el trabajador)
+CREATE OR REPLACE VIEW solicitudes_detalle AS
+  SELECT
+    s.id,
+    s.estado,
+    s.fecha_solicitud,
+    s.fecha_decision,
+    s.nombre_solicitante,
+    s.email_solicitante,
+    s.telefono,
+    s.ciudad,
+    s.vivienda,
+    s.mascotas_previas,
+    s.comentarios_admin,
+    m.id              AS mascota_id,
+    m.nombre          AS mascota_nombre,
+    m.estado          AS mascota_estado,
+    r.nombre          AS raza_nombre,
+    r.especie         AS raza_especie,
+    u.nombre          AS procesada_por_nombre
+  FROM solicitudes s
+  LEFT JOIN mascotas m ON s.mascota_id = m.id
+  LEFT JOIN raza r     ON m.raza_id = r.id
+  LEFT JOIN usuarios u ON s.procesada_por = u.id
+  ORDER BY s.fecha_solicitud DESC;
 
 -- Vista que une consultas con datos de mascota y veterinario
 CREATE OR REPLACE VIEW consultas_detalle AS

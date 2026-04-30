@@ -1,73 +1,98 @@
 /* Variables compartidas del portal */
 .portal-root {
-  --red: #dc2626;
-  --red-hover: #b91c1c;
+  --red: #DD010D;
+  --red-hover: #B90109;
   --red-light: #fee2e2;
   --dark: #0f172a;
-  --dark2: #1e293b;
-  --bg: #f1f5f9;
+  --bg: #ffffff;
+  --bg-soft: #FAFAFA;
   --text: #1e293b;
   --muted: #64748b;
-  --border: #e2e8f0;
-  --card-radius: 14px;
-  --btn-radius: 8px;
-  --white: #fff;
+  --border: #e5e7eb;
+  --card-radius: 16px;
+  --btn-radius: 999px;
 
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
   font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
-
 .portal-root *, .portal-root *::before, .portal-root *::after {
   box-sizing: border-box;
 }
 
-/* ── NAV ── */
+/* ── NAVBAR ── */
 .portal-root .navbar {
-  background: var(--dark);
-  padding: 0 40px;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  background: #fff;
+  border-bottom: 1px solid #f3f4f6;
+}
+.portal-root .navbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 14px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
 }
 .portal-root .navbar-brand {
-  display: flex; align-items: center; gap: 10px;
-  text-decoration: none; cursor: pointer;
-}
-.portal-root .brand-icon {
-  width: 34px; height: 34px;
-  background: var(--red); border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-}
-.portal-root .brand-name { font-size: 16px; font-weight: 700; color: #f1f5f9; }
-.portal-root .brand-name span { color: var(--red); }
-
-.portal-root .navbar-links { display: flex; align-items: center; gap: 6px; }
-.portal-root .nav-link {
-  padding: 7px 14px; font-size: 13px; color: #94a3b8;
-  background: none; border: none; border-radius: 7px;
-  cursor: pointer; transition: color .15s, background .15s;
-  font-family: inherit; text-decoration: none;
-}
-.portal-root .nav-link:hover, .portal-root .nav-link.active {
-  color: #f1f5f9; background: #1e293b;
-}
-.portal-root .btn-nav-cta {
-  padding: 7px 16px; background: var(--red); color: #fff;
-  border: none; border-radius: var(--btn-radius);
-  font-size: 13px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: background .15s;
+  display: flex; align-items: center; gap: 8px;
   text-decoration: none;
 }
-.portal-root .btn-nav-cta:hover { background: var(--red-hover); }
+.portal-root .brand-img {
+  height: 56px;
+  width: auto;
+  object-fit: contain;
+  transition: transform .15s;
+}
+.portal-root .navbar-brand:hover .brand-img { transform: scale(1.03); }
 
-/* ── BACK BUTTON ── */
+.portal-root .navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portal-root .btn-pill {
+  padding: 10px 24px;
+  border-radius: var(--btn-radius);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all .2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  font-family: inherit;
+  border: none;
+}
+.portal-root .btn-pill.primary {
+  background: var(--red);
+  color: #fff;
+}
+.portal-root .btn-pill.primary:hover {
+  background: var(--red-hover);
+  box-shadow: 0 6px 16px rgba(221,1,13,0.25);
+}
+.portal-root .btn-pill.outline {
+  background: #fff;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+.portal-root .btn-pill.outline:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+/* Espacio para que el contenido no quede debajo del navbar fijo */
+.portal-root router-outlet + * {
+  display: block;
+}
+
+/* ── FORM SHARED (para vistas adopción/cita) ── */
 .portal-root .back-btn {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 13px; color: var(--muted);
@@ -77,46 +102,14 @@
 }
 .portal-root .back-btn:hover { color: var(--text); }
 
-/* ── BUTTONS ── */
-.portal-root .btn-primary {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 13px 26px; background: var(--red); color: #fff;
-  border: none; border-radius: var(--btn-radius);
-  font-size: 14px; font-weight: 700; cursor: pointer;
-  font-family: inherit; transition: background .15s, transform .1s;
-}
-.portal-root .btn-primary:hover { background: var(--red-hover); transform: translateY(-1px); }
-.portal-root .btn-secondary {
-  display: inline-flex; align-items: center; gap: 7px;
-  padding: 13px 26px; background: rgba(255,255,255,0.08); color: #fff;
-  border: 1.5px solid rgba(255,255,255,0.2); border-radius: var(--btn-radius);
-  font-size: 14px; font-weight: 600; cursor: pointer;
-  font-family: inherit; transition: background .15s;
-}
-.portal-root .btn-secondary:hover { background: rgba(255,255,255,0.14); }
-
-/* ── PAGE HERO (vistas internas) ── */
 .portal-root .page-hero {
-  background: var(--dark); padding: 40px 40px 48px; text-align: center;
+  background: var(--dark); padding: 100px 40px 48px; text-align: center;
 }
 .portal-root .page-hero h1 {
   font-size: 28px; font-weight: 800; color: #f1f5f9; margin-bottom: 6px;
 }
 .portal-root .page-hero p { font-size: 13px; color: #64748b; }
 
-/* ── SECTION ── */
-.portal-root .section {
-  padding: 60px 40px; max-width: 1100px; margin: 0 auto;
-}
-.portal-root .section-header { text-align: center; margin-bottom: 40px; }
-.portal-root .section-header h2 {
-  font-size: 28px; font-weight: 800; color: var(--text); margin-bottom: 8px;
-}
-.portal-root .section-header p {
-  font-size: 14px; color: var(--muted); text-wrap: pretty;
-}
-
-/* ── FORM SHARED ── */
 .portal-root .form-group { margin-bottom: 14px; }
 .portal-root .form-group label {
   display: block; font-size: 11px; font-weight: 700;
@@ -136,11 +129,8 @@
 .portal-root .form-group select:focus {
   border-color: var(--red); background: #fff;
 }
-.portal-root .form-group input::placeholder,
-.portal-root .form-group textarea::placeholder { color: #cbd5e1; }
 .portal-root .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-/* ── CHIPS ── */
 .portal-root .chip {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 3px 9px; border-radius: 20px;
@@ -151,7 +141,7 @@
 /* ── FOOTER ── */
 .portal-root .footer {
   background: var(--dark); color: #475569;
-  text-align: center; padding: 20px 40px; font-size: 12px;
+  text-align: center; padding: 24px 40px; font-size: 12px;
   display: flex; align-items: center; justify-content: center; gap: 24px;
   flex-wrap: wrap;
 }
@@ -162,8 +152,9 @@
 }
 .portal-root .staff-access:hover { color: #94a3b8; }
 
-@media (max-width: 600px) {
-  .portal-root .section { padding: 40px 20px; }
-  .portal-root .navbar { padding: 0 16px; }
+@media (max-width: 768px) {
+  .portal-root .navbar-inner { padding: 12px 16px; }
+  .portal-root .navbar-links { gap: 6px; }
+  .portal-root .btn-pill { padding: 8px 14px; font-size: 11px; }
   .portal-root .form-grid-2 { grid-template-columns: 1fr; }
 }

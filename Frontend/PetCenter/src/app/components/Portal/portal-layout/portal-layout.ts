@@ -1,11 +1,11 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-portal-layout',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './portal-layout.html',
   styleUrl: './portal-layout.css',
   encapsulation: ViewEncapsulation.None

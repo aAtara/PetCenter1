@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Mascota, Raza } from '../models/mascotamodel';
-import { Solicitud, CrearSolicitud } from '../models/solicitudmodel';
+import { Solicitud, SolicitudDetalle, CrearSolicitud } from '../models/solicitudmodel';
 import { Veterinario, CrearVeterinario, Consulta, CrearConsulta, ConsultaDetalle } from '../models/veterinariomodel';
 
 export interface Usuario {
@@ -52,8 +52,11 @@ export class PetcenterService {
     return this.http.get<Mascota[]>(`${this.apiUrl}/mascotas?estado=eq.disponible`);
   }
 
-  crearMascota(mascota: Omit<Mascota, 'id'>): Observable<any> {
-    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+  crearMascota(mascota: any): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    });
     return this.http.post(`${this.apiUrl}/mascotas`, mascota, { headers });
   }
 
@@ -68,13 +71,12 @@ export class PetcenterService {
   // ─── SOLICITUDES ──────────────────────────────────────────
 
   getSolicitudes(): Observable<Solicitud[]> {
-    return this.http.get<Solicitud[]>(`${this.apiUrl}/solicitudes`);
+    return this.http.get<Solicitud[]>(`${this.apiUrl}/solicitudes?order=fecha_solicitud.desc`);
   }
 
-  getSolicitudesPorUsuario(usuarioId: string): Observable<Solicitud[]> {
-    return this.http.get<Solicitud[]>(
-      `${this.apiUrl}/solicitudes?usuario_id=eq.${usuarioId}`
-    );
+  /** Vista enriquecida con datos de la mascota y raza */
+  getSolicitudesDetalle(): Observable<SolicitudDetalle[]> {
+    return this.http.get<SolicitudDetalle[]>(`${this.apiUrl}/solicitudes_detalle`);
   }
 
   crearSolicitud(solicitud: CrearSolicitud): Observable<any> {
@@ -82,10 +84,19 @@ export class PetcenterService {
     return this.http.post(`${this.apiUrl}/solicitudes`, solicitud, { headers });
   }
 
-  actualizarEstadoSolicitud(id: string, estado: Solicitud['estado'], comentarios?: string): Observable<any> {
-    const datos: Partial<Solicitud> = { estado };
-    if (comentarios) datos.comentarios_admin = comentarios;
+  actualizarEstadoSolicitud(id: number, estado: Solicitud['estado'], procesadaPor?: number, comentarios?: string): Observable<any> {
+    const datos: any = {
+      estado,
+      fecha_decision: new Date().toISOString()
+    };
+    if (procesadaPor) datos.procesada_por = procesadaPor;
+    if (comentarios)  datos.comentarios_admin = comentarios;
     return this.http.patch(`${this.apiUrl}/solicitudes?id=eq.${id}`, datos);
+  }
+
+  /** Cambia el estado de una mascota — usado al aprobar una solicitud */
+  cambiarEstadoMascota(mascotaId: number, estado: 'disponible' | 'en_proceso' | 'adoptado'): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${mascotaId}`, { estado });
   }
 
   // ─── VETERINARIOS ─────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { PetcenterService } from '../../services/petcenter.service';
@@ -21,6 +21,7 @@ export class LoginComponent {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private petService: PetcenterService
   ) { }
 
@@ -46,7 +47,9 @@ export class LoginComponent {
 
         const usuario = usuarios[0];
         sessionStorage.setItem('usuario', JSON.stringify(usuario));
-        this.router.navigate(['/dashboard']);
+        // Si el guard guardó la URL original, regresar allí; si no, al dashboard
+        const redirect = this.route.snapshot.queryParamMap.get('redirect') || '/dashboard';
+        this.router.navigateByUrl(redirect);
       },
       error: () => {
         this.cargando = false;

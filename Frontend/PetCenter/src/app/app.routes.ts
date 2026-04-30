@@ -5,9 +5,10 @@ import { PortalLayoutComponent } from './components/Portal/portal-layout/portal-
 import { PortalHomeComponent } from './components/Portal/views/home/home';
 import { PortalAdopcionComponent } from './components/Portal/views/adopcion/adopcion';
 import { PortalCitaComponent } from './components/Portal/views/cita/cita';
+import { authGuard, noAuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
-  // Portal público (sin login, para clientes)
+  // Portal público (cliente, sin login)
   {
     path: '',
     component: PortalLayoutComponent,
@@ -18,10 +19,12 @@ export const routes: Routes = [
     ]
   },
 
-  // Staff
-  { path: 'login', component: LoginComponent },
-  { path: 'dashboard', component: DashboardComponent },
+  // Login: bloqueado si ya tiene sesión
+  { path: 'login', component: LoginComponent, canActivate: [noAuthGuard] },
 
-  // Catch-all → portal home
+  // Dashboard staff: requiere sesión
+  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+
+  // Catch-all
   { path: '**', redirectTo: '' }
 ];

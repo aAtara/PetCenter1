@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { PetcenterService } from '../../../../services/petcenter.service';
 
 @Component({
   selector: 'app-portal-home',
@@ -9,4 +10,54 @@ import { RouterLink } from '@angular/router';
   templateUrl: './home.html',
   styleUrl: './home.css'
 })
-export class PortalHomeComponent {}
+export class PortalHomeComponent implements OnInit {
+  @ViewChild('carruselTrack') carruselTrack?: ElementRef<HTMLDivElement>;
+
+  mascotas: any[] = [];
+  cargando = true;
+
+  // Beneficios para "¿Por qué adoptar?"
+  beneficios = [
+    { icon: '❤️', titulo: 'Salvas una vida',
+      desc: 'Cada adopción significa una segunda oportunidad para un animal que lo necesita.' },
+    { icon: '🏠', titulo: 'Compañía incondicional',
+      desc: 'Las mascotas adoptadas traen amor, alegría y lealtad a tu hogar.' },
+    { icon: '😊', titulo: 'Mejora tu bienestar',
+      desc: 'Está comprobado que las mascotas reducen el estrés y mejoran la salud mental.' },
+    { icon: '🛡️', titulo: 'Adopción responsable',
+      desc: 'Todas nuestras mascotas están vacunadas, desparasitadas y esterilizadas.' }
+  ];
+
+  constructor(private petService: PetcenterService) {}
+
+  ngOnInit() {
+    this.petService.getMascotasDetalle().subscribe({
+      next: (data) => {
+        // Solo disponibles para el carrusel
+        this.mascotas = data.filter((m: any) => m.estado === 'disponible');
+        this.cargando = false;
+      },
+      error: () => { this.cargando = false; }
+    });
+  }
+
+  emojiEspecie(especie: string): string {
+    const map: Record<string, string> = { perro: '🐶', gato: '🐱' };
+    return map[(especie || '').toLowerCase()] || '🐾';
+  }
+
+  bgEspecie(especie: string): string {
+    const map: Record<string, string> = {
+      perro: '#fef3c7', gato: '#e0e7ff'
+    };
+    return map[(especie || '').toLowerCase()] || '#f1f5f9';
+  }
+
+  scrollCarrusel(dir: 'left' | 'right') {
+    const el = this.carruselTrack?.nativeElement;
+    if (!el) return;
+    const card = el.querySelector('.carrusel-card') as HTMLElement;
+    const cardW = card ? card.offsetWidth + 16 : 280;
+    el.scrollBy({ left: dir === 'left' ? -cardW : cardW, behavior: 'smooth' });
+  }
+}
