@@ -34,6 +34,14 @@ export class PetcenterService {
     return this.http.get<Raza[]>(`${this.apiUrl}/raza`);
   }
 
+  crearRaza(raza: { nombre: string; especie: string }): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    });
+    return this.http.post(`${this.apiUrl}/raza`, raza, { headers });
+  }
+
   // ─── MASCOTAS ─────────────────────────────────────────────
 
   getMascotas(): Observable<Mascota[]> {
@@ -61,11 +69,13 @@ export class PetcenterService {
   }
 
   actualizarMascota(id: string, datos: Partial<Mascota>): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${id}`, datos);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+    return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${id}`, datos, { headers });
   }
 
   eliminarMascota(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/mascotas?id=eq.${id}`);
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.delete(`${this.apiUrl}/mascotas?id=eq.${id}`, { headers });
   }
 
   // ─── SOLICITUDES ──────────────────────────────────────────
@@ -91,12 +101,14 @@ export class PetcenterService {
     };
     if (procesadaPor) datos.procesada_por = procesadaPor;
     if (comentarios)  datos.comentarios_admin = comentarios;
-    return this.http.patch(`${this.apiUrl}/solicitudes?id=eq.${id}`, datos);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+    return this.http.patch(`${this.apiUrl}/solicitudes?id=eq.${id}`, datos, { headers });
   }
 
   /** Cambia el estado de una mascota — usado al aprobar una solicitud */
   cambiarEstadoMascota(mascotaId: number, estado: 'disponible' | 'en_proceso' | 'adoptado'): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${mascotaId}`, { estado });
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+    return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${mascotaId}`, { estado }, { headers });
   }
 
   // ─── VETERINARIOS ─────────────────────────────────────────
@@ -115,11 +127,13 @@ export class PetcenterService {
   }
 
   actualizarVeterinario(id: number, datos: Partial<Veterinario>): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/veterinarios?id=eq.${id}`, datos);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+    return this.http.patch(`${this.apiUrl}/veterinarios?id=eq.${id}`, datos, { headers });
   }
 
   eliminarVeterinario(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/veterinarios?id=eq.${id}`);
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.delete(`${this.apiUrl}/veterinarios?id=eq.${id}`, { headers });
   }
 
   // ─── CONSULTAS VETERINARIAS ───────────────────────────────
@@ -140,7 +154,8 @@ export class PetcenterService {
   }
 
   eliminarConsulta(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/consultas_veterinarias?id=eq.${id}`);
+    const headers = new HttpHeaders({ 'Prefer': 'return=representation' });
+    return this.http.delete(`${this.apiUrl}/consultas_veterinarias?id=eq.${id}`, { headers });
   }
 
   // ─── CITAS PÚBLICAS ──────────────────────────────────────
@@ -155,6 +170,7 @@ export class PetcenterService {
   }
 
   actualizarCita(id: number, datos: any): Observable<any> {
-    return this.http.patch(`${this.apiUrl}/citas?id=eq.${id}`, datos);
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
+    return this.http.patch(`${this.apiUrl}/citas?id=eq.${id}`, datos, { headers });
   }
 }

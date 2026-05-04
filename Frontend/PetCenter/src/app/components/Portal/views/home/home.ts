@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { PetcenterService } from '../../../../services/petcenter.service';
@@ -28,16 +28,28 @@ export class PortalHomeComponent implements OnInit {
       desc: 'Todas nuestras mascotas están vacunadas, desparasitadas y esterilizadas.' }
   ];
 
-  constructor(private petService: PetcenterService) {}
+  constructor(
+    private petService: PetcenterService,
+    private cdr: ChangeDetectorRef,
+    private zone: NgZone
+  ) {}
 
   ngOnInit() {
     this.petService.getMascotasDetalle().subscribe({
       next: (data) => {
-        // Solo disponibles para el carrusel
-        this.mascotas = data.filter((m: any) => m.estado === 'disponible');
-        this.cargando = false;
+        this.zone.run(() => {
+          this.mascotas = data.filter((m: any) => m.estado === 'disponible');
+          this.cargando = false;
+          this.cdr.detectChanges();
+        });
       },
-      error: () => { this.cargando = false; }
+      error: (err) => {
+        console.error('[home] error mascotas:', err);
+        this.zone.run(() => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+        });
+      }
     });
   }
 

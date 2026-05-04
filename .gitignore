@@ -28,5 +28,9 @@ Thumbs.db
 .env
 *.env.local
 
+# API keys de Angular (NO subir a GitHub)
+Frontend/PetCenter/src/environments/environment.ts
+Frontend/PetCenter/src/environments/environment.development.ts
+
 # ─── Docker volumes ────────────────────────────
 postgres_data/	

@@ -6,7 +6,11 @@
       "WebFetch(domain:claude.ai)",
       "Bash(npx ng *)",
       "Bash(echo '{\"nombre\":\"Pepe\",\"edad_meses\":14,\"genero\":\"macho\",\"raza_id\":1,\"estado\":\"disponible\",\"descripcion\":\"Test\",\"fecha_ingreso\":\"2026-04-29\"}')",
-      "Bash(curl -s -X POST \"http://localhost:3000/mascotas\" -H \"Content-Type: application/json\" -H \"Prefer: return=representation\" --data-binary @/tmp/m.json)"
+      "Bash(curl -s -X POST \"http://localhost:3000/mascotas\" -H \"Content-Type: application/json\" -H \"Prefer: return=representation\" --data-binary @/tmp/m.json)",
+      "Bash(curl -s \"http://localhost:3000/citas\")",
+      "Bash(curl -s \"http://localhost:3000/veterinarios?activo=eq.true\")",
+      "Bash(curl -s \"http://localhost:3000/mascotas_detalle\")",
+      "Bash(curl -s \"http://localhost:3000/citas?order=creado_en.desc\")"
     ]
   }
 }

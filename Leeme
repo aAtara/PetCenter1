@@ -66,6 +66,21 @@ npm install
 
 (la primera vez tarda 1-2 minutos)
 
+### Paso 4.5 — Configura tu API key de razas (The Dog API)
+
+El proyecto usa **The Dog API** y **The Cat API** para autocompletar razas de mascotas. Necesitas tu propia API key gratis:
+
+1. Ve a https://thedogapi.com/signup
+2. Regístrate (solo email) → te llega la key por correo
+3. Copia el archivo plantilla:
+   ```bash
+   # En la carpeta src/environments/
+   cp environment.example.ts environment.ts
+   cp environment.example.ts environment.development.ts
+   ```
+4. Edita ambos archivos y reemplaza `'tu_key_aqui'` por tu key real
+5. La misma key sirve para perros Y gatos
+
 ### Paso 5 — Correr el frontend
 
 ```bash

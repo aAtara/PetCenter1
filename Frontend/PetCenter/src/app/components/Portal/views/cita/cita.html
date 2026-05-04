@@ -90,12 +90,46 @@
       </div>
       <div class="form-group">
         <label>Tipo de Mascota</label>
-        <select [(ngModel)]="form.tipo">
-          <option value="">Selecciona</option>
-          <option>🐶 Perro</option>
-          <option>🐱 Gato</option>
-          <option>Otro</option>
-        </select>
+        <div style="display:flex; gap:8px; margin-bottom:8px;">
+          <button type="button"
+                  class="filter-btn"
+                  [class.active]="especieRaza === 'perro'"
+                  (click)="cambiarEspecieRaza('perro')">🐶 Perro</button>
+          <button type="button"
+                  class="filter-btn"
+                  [class.active]="especieRaza === 'gato'"
+                  (click)="cambiarEspecieRaza('gato')">🐱 Gato</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Raza de tu mascota
+          <small style="color:#94a3b8;font-weight:normal"> (escribe para buscar)</small>
+        </label>
+        <div class="autocomplete">
+          <input type="text"
+                 [ngModel]="form.tipo"
+                 (ngModelChange)="onRazaInput($event)"
+                 name="razaCita"
+                 placeholder="Ej: Labrador, Persa, Husky..."
+                 autocomplete="off">
+          <span *ngIf="buscandoRaza" class="ac-loading">⏳</span>
+
+          <ul class="ac-sugerencias" *ngIf="sugerenciasRaza.length > 0 && !razaSeleccionada">
+            <li *ngFor="let r of sugerenciasRaza" (click)="seleccionarRazaCita(r)">
+              <strong>{{ r.name }}</strong>
+              <small *ngIf="r.temperament">{{ r.temperament }}</small>
+            </li>
+          </ul>
+
+          <div class="ac-info" *ngIf="razaSeleccionada">
+            <div><strong>{{ razaSeleccionada.name }}</strong></div>
+            <small *ngIf="razaSeleccionada.temperament">🐾 {{ razaSeleccionada.temperament }}</small>
+            <small *ngIf="razaSeleccionada.life_span">⏳ Esperanza de vida: {{ razaSeleccionada.life_span }}</small>
+            <small *ngIf="razaSeleccionada.weight?.metric">⚖ Peso típico: {{ razaSeleccionada.weight!.metric }} kg</small>
+            <small *ngIf="razaSeleccionada.bred_for">🎯 Criado para: {{ razaSeleccionada.bred_for }}</small>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label>Motivo de Consulta</label>
