@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
  * Modelo de una raza tal como la devuelve The Dog API / Cat API
  */
 export interface RazaApi {
-  id: number;
+  id: number | string;           // perros usan number, gatos usan string ("abys", "siam"...)
   name: string;                  // "Labrador Retriever"
   temperament?: string;          // "Friendly, Active, Outgoing"
   origin?: string;               // "Canada"
@@ -86,7 +86,7 @@ export class RazasApiService {
     });
   }
 
-  getRazaPorId(especie: 'perro' | 'gato', id: number): Observable<RazaApi> {
+  getRazaPorId(especie: 'perro' | 'gato', id: number | string): Observable<RazaApi> {
     const url = especie === 'perro'
       ? `${this.dogApiUrl}/breeds/${id}`
       : `${this.catApiUrl}/breeds/${id}`;

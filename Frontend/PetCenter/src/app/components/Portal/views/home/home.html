@@ -31,7 +31,8 @@
       <div class="carrusel-track" #carruselTrack>
         <div class="carrusel-card" *ngFor="let m of mascotas">
           <div class="carrusel-img" [style.background]="bgEspecie(m.raza_especie)">
-            {{ emojiEspecie(m.raza_especie) }}
+            <img *ngIf="m.foto_url" [src]="m.foto_url" [alt]="m.nombre" class="carrusel-img-real">
+            <span *ngIf="!m.foto_url">{{ emojiEspecie(m.raza_especie) }}</span>
           </div>
           <div class="carrusel-name">{{ m.nombre.toUpperCase() }}</div>
         </div>

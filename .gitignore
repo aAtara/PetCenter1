@@ -33,4 +33,7 @@ Frontend/PetCenter/src/environments/environment.ts
 Frontend/PetCenter/src/environments/environment.development.ts
 
 # ─── Docker volumes ────────────────────────────
-postgres_data/	
+postgres_data/
+
+# ─── Imágenes subidas por el servidor Express ──
+uploads/

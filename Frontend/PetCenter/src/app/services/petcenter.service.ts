@@ -68,6 +68,13 @@ export class PetcenterService {
     return this.http.post(`${this.apiUrl}/mascotas`, mascota, { headers });
   }
 
+  /** Sube una imagen al servidor Express (puerto 3001 vía proxy) */
+  subirFoto(file: File): Observable<{ url: string; filename: string; size: number }> {
+    const formData = new FormData();
+    formData.append('foto', file);
+    return this.http.post<{ url: string; filename: string; size: number }>('/upload', formData);
+  }
+
   actualizarMascota(id: string, datos: Partial<Mascota>): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json', 'Prefer': 'return=representation' });
     return this.http.patch(`${this.apiUrl}/mascotas?id=eq.${id}`, datos, { headers });

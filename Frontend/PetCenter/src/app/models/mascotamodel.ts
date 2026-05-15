@@ -13,5 +13,6 @@ export interface Mascota {
   raza?: Raza;
   estado: 'disponible' | 'en_proceso' | 'adoptado';
   descripcion: string;
+  foto_url?: string | null;
   fecha_ingreso: string;
 }

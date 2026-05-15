@@ -10,7 +10,10 @@
       "Bash(curl -s \"http://localhost:3000/citas\")",
       "Bash(curl -s \"http://localhost:3000/veterinarios?activo=eq.true\")",
       "Bash(curl -s \"http://localhost:3000/mascotas_detalle\")",
-      "Bash(curl -s \"http://localhost:3000/citas?order=creado_en.desc\")"
+      "Bash(curl -s \"http://localhost:3000/citas?order=creado_en.desc\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)"
     ]
   }
 }

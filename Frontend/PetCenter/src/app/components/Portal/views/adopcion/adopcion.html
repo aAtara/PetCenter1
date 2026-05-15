@@ -25,7 +25,8 @@
   <div *ngIf="!cargando" class="pets-grid">
     <div class="pet-card" *ngFor="let m of mascotasFiltradas">
       <div class="pet-photo" [style.background]="bgEspecie(m.raza_especie)">
-        {{ emojiEspecie(m.raza_especie) }}
+        <img *ngIf="m.foto_url" [src]="m.foto_url" [alt]="m.nombre" class="pet-photo-img">
+        <span *ngIf="!m.foto_url" class="pet-emoji">{{ emojiEspecie(m.raza_especie) }}</span>
         <span class="estado-dot">
           <span class="chip"
                 [style.background]="m.estado === 'disponible' ? '#d1fae5' : '#fef3c7'"
@@ -60,7 +61,14 @@
 
     <!-- Formulario -->
     <div *ngIf="!modalExito">
-      <h3>{{ emojiEspecie(mascotaSeleccionada?.raza_especie) }} Solicitud para {{ mascotaSeleccionada?.nombre }}</h3>
+      <h3>
+        <img *ngIf="mascotaSeleccionada?.foto_url"
+             [src]="mascotaSeleccionada.foto_url"
+             [alt]="mascotaSeleccionada.nombre"
+             style="width:32px;height:32px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;">
+        <span *ngIf="!mascotaSeleccionada?.foto_url">{{ emojiEspecie(mascotaSeleccionada?.raza_especie) }}</span>
+        Solicitud para {{ mascotaSeleccionada?.nombre }}
+      </h3>
       <div class="modal-sub">{{ mascotaSeleccionada?.raza_nombre }} · Completa tus datos y nos pondremos en contacto</div>
 
       <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>

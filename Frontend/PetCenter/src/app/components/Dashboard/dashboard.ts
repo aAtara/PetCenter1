@@ -513,6 +513,15 @@ export class DashboardComponent implements OnInit {
   filtroMascota: 'todas' | 'disponible' | 'en_proceso' | 'adoptado' = 'todas';
   busquedaMascota = '';
 
+  // ─── Filtro catálogo "Disponibles" ───
+  filtroDisponibles: 'todos' | 'perro' | 'gato' = 'todos';
+
+  get mascotasDisponiblesFiltradas(): any[] {
+    const disponibles = this.mascotas.filter(m => m.estado === 'disponible');
+    if (this.filtroDisponibles === 'todos') return disponibles;
+    return disponibles.filter(m => (m.raza_especie || '').toLowerCase() === this.filtroDisponibles);
+  }
+
   get mascotasFiltradas(): any[] {
     if (this.filtroMascota === 'todas') return this.mascotas;
     return this.mascotas.filter(m => m.estado === this.filtroMascota);
@@ -574,6 +583,39 @@ export class DashboardComponent implements OnInit {
   razaApiSeleccionada: RazaApi | null = null;
   buscandoRaza = false;
   especieParaApi: 'perro' | 'gato' = 'perro';
+
+  // ─── Subida de foto de mascota ───
+  fotoFile: File | null = null;          // archivo nuevo seleccionado
+  fotoPreview: string | null = null;     // URL del preview (existente o nueva)
+  fotoUrlActual: string | null = null;   // URL ya guardada en BD (al editar)
+
+  onFotoChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      this.mensaje = 'Solo se aceptan imágenes.';
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      this.mensaje = 'La imagen no puede pesar más de 5 MB.';
+      return;
+    }
+    this.fotoFile = file;
+    // Preview local con FileReader
+    const reader = new FileReader();
+    reader.onload = (e: any) => this.zone.run(() => {
+      this.fotoPreview = e.target.result;
+      this.cdr.detectChanges();
+    });
+    reader.readAsDataURL(file);
+  }
+
+  quitarFoto() {
+    this.fotoFile = null;
+    this.fotoPreview = null;
+    this.fotoUrlActual = null;
+  }
 
   mascotaVacia() {
     return {
@@ -824,6 +866,10 @@ export class DashboardComponent implements OnInit {
     this.razaApiSeleccionada = null;
     this.sugerenciasRaza = [];
     this.especieParaApi = 'perro';
+    // Resetea foto
+    this.fotoFile = null;
+    this.fotoPreview = null;
+    this.fotoUrlActual = null;
     this.mostrarFormMascota = true;
     if (this.razas.length === 0) {
       this.petService.getRazas().subscribe({
@@ -840,6 +886,10 @@ export class DashboardComponent implements OnInit {
     this.razaApiSeleccionada = null;
     this.sugerenciasRaza = [];
     this.especieParaApi = (m.raza_especie === 'gato') ? 'gato' : 'perro';
+    // Pre-llena foto si la mascota ya tenía una
+    this.fotoFile = null;
+    this.fotoUrlActual = m.foto_url || null;
+    this.fotoPreview = m.foto_url || null;
     this.nuevaMascota = {
       nombre: m.nombre || '',
       edad_meses: m.edad_meses ?? null,
@@ -868,48 +918,79 @@ export class DashboardComponent implements OnInit {
       return;
     }
     this.guardandoMascota = true;
-    const payload: any = {
-      nombre: m.nombre,
-      edad_meses: Number(m.edad_meses),
-      genero: m.genero,
-      raza_id: Number(m.raza_id),
-      estado: m.estado,
-      fecha_ingreso: m.fecha_ingreso,
-      descripcion: m.descripcion || null
+
+    // Función que finalmente guarda la mascota (con foto_url ya resuelto)
+    const guardar = (fotoUrl: string | null) => {
+      const payload: any = {
+        nombre: m.nombre,
+        edad_meses: Number(m.edad_meses),
+        genero: m.genero,
+        raza_id: Number(m.raza_id),
+        estado: m.estado,
+        fecha_ingreso: m.fecha_ingreso,
+        descripcion: m.descripcion || null,
+        foto_url: fotoUrl
+      };
+
+      const onSuccess = (res: any) => {
+        console.log('[guardarMascota] ÉXITO ✅:', res);
+        this.zone.run(() => {
+          this.guardandoMascota = false;
+          this.mostrarFormMascota = false;
+          this.editandoMascotaId = null;
+          this.fotoFile = null;
+          this.fotoPreview = null;
+          this.fotoUrlActual = null;
+          this.mensaje = esEdicion
+            ? `✏️ Mascota "${m.nombre}" actualizada ✅`
+            : `🐾 Mascota "${m.nombre}" registrada ✅`;
+          this.cargarDatos();
+          this.cdr.detectChanges();
+          setTimeout(() => { this.mensaje = ''; this.cdr.detectChanges(); }, 3000);
+        });
+      };
+
+      const onError = (err: any) => {
+        console.error('[guardarMascota] ERROR ❌:', err);
+        this.zone.run(() => {
+          this.guardandoMascota = false;
+          this.mensaje = `Error: ${err?.error?.message || err?.message || 'desconocido'}`;
+          this.cdr.detectChanges();
+        });
+      };
+
+      if (esEdicion) {
+        this.petService.actualizarMascota(String(this.editandoMascotaId), payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      } else {
+        this.petService.crearMascota(payload).subscribe({
+          next: onSuccess, error: onError
+        });
+      }
     };
 
-    const onSuccess = (res: any) => {
-      console.log('[guardarMascota] ÉXITO ✅:', res);
-      this.zone.run(() => {
-        this.guardandoMascota = false;
-        this.mostrarFormMascota = false;
-        this.editandoMascotaId = null;
-        this.mensaje = esEdicion
-          ? `✏️ Mascota "${m.nombre}" actualizada ✅`
-          : `🐾 Mascota "${m.nombre}" registrada ✅`;
-        this.cargarDatos();
-        this.cdr.detectChanges();
-        setTimeout(() => { this.mensaje = ''; this.cdr.detectChanges(); }, 3000);
-      });
-    };
-
-    const onError = (err: any) => {
-      console.error('[guardarMascota] ERROR ❌:', err);
-      this.zone.run(() => {
-        this.guardandoMascota = false;
-        this.mensaje = `Error: ${err?.error?.message || err?.message || 'desconocido'}`;
-        this.cdr.detectChanges();
-      });
-    };
-
-    if (esEdicion) {
-      this.petService.actualizarMascota(String(this.editandoMascotaId), payload).subscribe({
-        next: onSuccess, error: onError
+    // Si hay foto NUEVA, súbela primero, luego guarda con la URL.
+    // Si NO hay foto nueva, usa la URL existente (al editar) o null.
+    if (this.fotoFile) {
+      console.log('[guardarMascota] subiendo foto...');
+      this.petService.subirFoto(this.fotoFile).subscribe({
+        next: (resp) => {
+          console.log('[guardarMascota] foto subida:', resp.url);
+          guardar(resp.url);
+        },
+        error: (err) => {
+          console.error('[guardarMascota] error subiendo foto:', err);
+          this.zone.run(() => {
+            this.guardandoMascota = false;
+            this.mensaje = '⚠️ No se pudo subir la imagen. ¿Está el servidor 3001 corriendo? (npm run img-server)';
+            this.cdr.detectChanges();
+          });
+        }
       });
     } else {
-      this.petService.crearMascota(payload).subscribe({
-        next: onSuccess, error: onError
-      });
+      // Sin foto nueva: conserva la URL anterior (puede ser null si la quitaron)
+      guardar(this.fotoUrlActual);
     }
   }
 

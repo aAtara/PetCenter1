@@ -224,51 +224,36 @@
       </div>
 
       <div class="filtros">
-        <button class="filtro active">Todos 🐾</button>
-        <button class="filtro">Perros 🐕</button>
-        <button class="filtro">Gatos 🐈</button>
+        <button class="filtro" [class.active]="filtroDisponibles === 'todos'" (click)="filtroDisponibles = 'todos'">Todos 🐾</button>
+        <button class="filtro" [class.active]="filtroDisponibles === 'perro'" (click)="filtroDisponibles = 'perro'">Perros 🐕</button>
+        <button class="filtro" [class.active]="filtroDisponibles === 'gato'"  (click)="filtroDisponibles = 'gato'">Gatos 🐈</button>
       </div>
 
-      <div class="catalogo-grid">
-        <div class="catalogo-card">
-          <div class="catalogo-img">🐱</div>
-          <div class="catalogo-body">
-            <h3>Luna</h3>
-            <p class="catalogo-sub">Siamés · 2 años</p>
-            <div class="tag-row">
-              <span class="tag gato">Gato</span>
-              <span class="tag hembra">Hembra</span>
-              <span class="tag esteril">Esterilizado</span>
-            </div>
-          </div>
-          <button class="btn-adoptar">Solicitar Adopción →</button>
-        </div>
+      <div *ngIf="cargando" class="loading">Cargando catálogo...</div>
 
-        <div class="catalogo-card">
-          <div class="catalogo-img">🐶</div>
-          <div class="catalogo-body">
-            <h3>Manchas</h3>
-            <p class="catalogo-sub">Mestizo · 1 año</p>
-            <div class="tag-row">
-              <span class="tag perro">Perro</span>
-              <span class="tag macho">Macho</span>
-              <span class="tag esteril">Esterilizado</span>
-            </div>
-          </div>
-          <button class="btn-adoptar">Solicitar Adopción →</button>
-        </div>
+      <div *ngIf="!cargando && mascotasDisponiblesFiltradas.length === 0" class="empty">
+        No hay mascotas disponibles en esta categoría.
+      </div>
 
-        <div class="catalogo-card">
-          <div class="catalogo-img">🐶</div>
+      <div *ngIf="!cargando" class="catalogo-grid">
+        <div class="catalogo-card" *ngFor="let m of mascotasDisponiblesFiltradas">
+          <div class="catalogo-img">
+            <img *ngIf="m.foto_url" [src]="m.foto_url" [alt]="m.nombre" class="catalogo-img-real">
+            <span *ngIf="!m.foto_url">{{ emojiEspecie(m.raza_especie) }}</span>
+          </div>
           <div class="catalogo-body">
-            <h3>Max</h3>
-            <p class="catalogo-sub">Labrador · 1 año</p>
+            <h3>{{ m.nombre }}</h3>
+            <p class="catalogo-sub">{{ m.raza_nombre || '—' }} · {{ edadLegible(m.edad_meses) }}</p>
             <div class="tag-row">
-              <span class="tag perro">Perro</span>
-              <span class="tag macho">Macho</span>
+              <span class="tag" [ngClass]="m.raza_especie === 'gato' ? 'gato' : 'perro'">
+                {{ m.raza_especie | titlecase }}
+              </span>
+              <span class="tag" [ngClass]="m.genero === 'macho' ? 'macho' : 'hembra'">
+                {{ m.genero | titlecase }}
+              </span>
             </div>
           </div>
-          <button class="btn-adoptar">Solicitar Adopción →</button>
+          <button class="btn-adoptar" (click)="verDetalleMascota(m)">Ver detalle →</button>
         </div>
       </div>
     </section>
@@ -629,7 +614,8 @@
         <div class="mascota-card" *ngFor="let m of mascotasFiltradas">
           <div class="mc-top">
             <div class="mc-avatar" [ngClass]="m.raza_especie === 'gato' ? 'gato' : 'perro'">
-              {{ m.raza_especie === 'gato' ? '🐱' : '🐶' }}
+              <img *ngIf="m.foto_url" [src]="m.foto_url" [alt]="m.nombre" class="mc-avatar-img">
+              <span *ngIf="!m.foto_url">{{ m.raza_especie === 'gato' ? '🐱' : '🐶' }}</span>
             </div>
             <span class="estado" [ngClass]="'estado-' + m.estado">
               {{ m.estado.replace('_', ' ') }}
@@ -1048,7 +1034,11 @@
       <!-- Cabecera mascota (datos reales) -->
       <div class="hm-mascota-card">
         <div class="hm-mascota-photo">
-          {{ emojiEspecie(mascotaSeleccionada.raza_especie) }}
+          <img *ngIf="mascotaSeleccionada.foto_url"
+               [src]="mascotaSeleccionada.foto_url"
+               [alt]="mascotaSeleccionada.nombre"
+               class="hm-mascota-photo-img">
+          <span *ngIf="!mascotaSeleccionada.foto_url">{{ emojiEspecie(mascotaSeleccionada.raza_especie) }}</span>
         </div>
         <div class="hm-mascota-info">
           <div class="hm-nombre">{{ mascotaSeleccionada.nombre }}</div>
@@ -1585,6 +1575,14 @@
           <label>Fecha de ingreso
             <input type="date" [(ngModel)]="nuevaMascota.fecha_ingreso">
           </label>
+          <label>Foto de la mascota
+            <input type="file" accept="image/*" (change)="onFotoChange($event)">
+            <div class="foto-preview-wrap" *ngIf="fotoPreview">
+              <img [src]="fotoPreview" alt="Preview" class="foto-preview">
+              <button type="button" class="btn-quitar-foto" (click)="quitarFoto()">✕ Quitar foto</button>
+            </div>
+          </label>
+
           <label>Descripción
             <textarea rows="3" [(ngModel)]="nuevaMascota.descripcion"
                       placeholder="Cuéntanos sobre la mascota, su personalidad, etc."></textarea>

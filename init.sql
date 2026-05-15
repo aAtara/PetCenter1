@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS mascotas (
   raza_id        INT REFERENCES raza(id),
   estado         TEXT NOT NULL DEFAULT 'disponible' CHECK (estado IN ('disponible', 'en_proceso', 'adoptado')),
   descripcion    TEXT,
+  foto_url       TEXT,
   fecha_ingreso  DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
@@ -143,6 +144,7 @@ CREATE OR REPLACE VIEW mascotas_detalle AS
     m.genero,
     m.estado,
     m.descripcion,
+    m.foto_url,
     m.fecha_ingreso,
     r.id       AS raza_id,
     r.nombre   AS raza_nombre,
